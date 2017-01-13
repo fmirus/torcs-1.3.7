@@ -1,0 +1,11 @@
+--- ../torcs-1.3.7-patched/src/doc/torcsdoc.conf	2016-10-08 15:18:00.034650137 +0200
++++ doc/torcsdoc.conf	2016-05-18 20:23:10.000000000 +0200
+@@ -149,7 +149,7 @@
+ # relative paths, which will be relative from the directory where doxygen is
+ # started.
+ 
+-STRIP_FROM_PATH        = /home/burger/Downloads/torcs-1.3.7/
++STRIP_FROM_PATH        = /home/berni/torcs_src/torcs/torcs/
+ 
+ # The STRIP_FROM_INC_PATH tag can be used to strip a user-defined part of
+ # the path mentioned in the documentation of a class, which tells

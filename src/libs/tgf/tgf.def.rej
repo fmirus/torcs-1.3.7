@@ -1,0 +1,63 @@
+--- libs/tgf/tgf.def	2014-05-23 10:38:31.000000000 +0200
++++ ../torcs-1.3.7-patched/src/libs/tgf/tgf.def	2016-10-08 15:11:53.449933013 +0200
+@@ -14,15 +14,15 @@
+ 	GfModInfo
+ 	GfModInfoDir
+ 	GfModFreeInfoList
+-	GfDirGetList
++	GfDirGetList
+ 	GfDirGetListFiltered
+ 	GfDirFreeList
+-	GfParmReadFile
++	GfParmReadFile
+ 	GfParmSetDTD
+ 	GfParmWriteFile
+ 	GfParmCreateDirectory
+ 	GfParmGetName
+-	GfParmGetStr
++	GfParmGetStr
+ 	GetDataDir
+ 	GfParmGetCurStr
+ 	GfParmSetStr
+@@ -55,17 +55,29 @@
+ 	_tgf_win_free
+ 	_tgf_win_strdup
+ 	GetLocalDir
+-	SetLocalDir
+-	GetDataDir
++	SetLocalDir
++	GetDataDir
+ 	SetDataDir
+-	GfHashRelease
+-	GfHashAddStr
+-	GfHashGetStr
+-	GfHashCreate
+-	GetLibDir
+-	SetLibDir
+-	SetSingleTextureMode
+-	GetSingleTextureMode
+-	GfNearestPow2
+-	GfCreateDir
+-	GfCreateDirForFile+	GfHashRelease
++	GfHashAddStr
++	GfHashGetStr
++	GfHashCreate
++	GetLibDir
++	SetLibDir
++	SetSingleTextureMode
++	GetSingleTextureMode
++	GfNearestPow2
++	GfCreateDir
++	GfCreateDirForFile
++	setDamageLimit
++	getDamageLimit
++	setFuelConsumption
++	getFuelConsumption
++	setLaptimeLimit
++	getLaptimeLimit
++	setTimeout
++	getTimeout
++	setNoisy
++	getNoisy
++	setVersion
++	getVersion	

@@ -1,0 +1,10 @@
+message TorcsData{
+    repeated int32 width = 1;
+    repeated int32 height = 2;
+    repeated bytes image = 3;
+    repeated int32 save_flag = 4;
+    repeated double steer_angle = 5;
+    repeated bytes red = 6;
+    repeated bytes green = 7;
+    repeated bytes blue = 8;
+}
