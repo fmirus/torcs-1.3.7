@@ -1,4 +1,4 @@
-__TORCS 1.3.7 with [SCR patch] (https://github.com/barisdemirdelen/scr-torcs-1.3.7) and screenpipe Python client.__
+__TORCS 1.3.7 with [SCR patch](https://github.com/barisdemirdelen/scr-torcs-1.3.7) and screenpipe Python client.__
 
 1.  Introduction
 2.  Documentation
