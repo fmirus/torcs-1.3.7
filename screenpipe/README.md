@@ -28,6 +28,7 @@ sudo apt install python-matplotlib
 1. Rebuild TORCS
 	```
 	cd torcs-1.3.7
+	./configure
 	make
 	sudo make install
 	sudo make datainstall
