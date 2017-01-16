@@ -2,7 +2,8 @@
 
 - OpenCV
 ```
-sudo apt install libopencv-dev python-opencv```
+sudo apt install libopencv-dev python-opencv
+```
 
 - ZMQ
 ```
@@ -14,11 +15,13 @@ sudo apt install libzmq5-dev
 
 - Protobuf
 ```
-sudo apt install libprotobuf-dev python-protobuf ```
+sudo apt install libprotobuf-dev python-protobuf 
+```
 
 - Matplotlib
 ```
-sudo apt install python-matplotlib```
+sudo apt install python-matplotlib
+```
 
 
 # How to build
