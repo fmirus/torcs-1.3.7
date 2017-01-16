@@ -26,33 +26,33 @@ sudo apt install python-matplotlib
 
 # How to build
 1. Rebuild TORCS
-```
-cd torcs-1.3.7
-./configure
-make
-sudo make install
-sudo make datainstall
-```
+	```
+	cd torcs-1.3.7
+	./configure
+	make
+	sudo make install
+	sudo make datainstall
+	```
 2. Compile memory sharing source
-```
-cd torcs-1.3.7/screenpipe
-g++ IPC_command.cpp torcs_data.pb.cc -o IPC_command `pkg-config --cflags --libs opencv protobuf libzmq`
-```
+	```
+	cd torcs-1.3.7/screenpipe
+	g++ IPC_command.cpp torcs_data.pb.cc -o IPC_command `pkg-config --cflags --libs opencv protobuf libzmq`
+	```
 
 # How to execute
 1. Run torcs
-```
-torcs
-```
+	```
+	torcs
+	```
 2. Start memory sharing (initially paused)
-```
-cd torcs-1.3.7/screenpipe
-./IPC_command # window "Image from TORCS" appears
-```
+	```
+	cd torcs-1.3.7/screenpipe
+	./IPC_command # window "Image from TORCS" appears
+	```
 3. Run Python client that receives screen images
-```
-python screenpipe_client.py
-```
+	```
+	python screenpipe_client.py
+	```
 4. Press `P` (unpause) to start sharing images in the window named "Image from TORCS"
 
 # Troubleshooting
