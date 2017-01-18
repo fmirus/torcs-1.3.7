@@ -15,7 +15,7 @@
 #include <stdio.h>
 #include <opencv2/opencv.hpp>
 // #include "cv.h"  
-#include "highgui.h"
+#include "opencv2/highgui/highgui.hpp"
 #include <zmq.hpp> 
 #include "torcs_data.pb.h"
 
