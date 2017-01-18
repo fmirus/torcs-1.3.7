@@ -23,6 +23,16 @@ sudo apt install libprotobuf-dev python-protobuf
 sudo apt install python-matplotlib
 ```
 
+- Anaconda packages installation
+```
+conda install -c conda-forge ipdb=0.10.1
+conda install -c menpo opencv3=3.1.0
+conda install -c anaconda protobuf=3.0.0
+```
+
+# Files changes compared to original (patched) torcs-1.3.7
+- torcs-1.3.7/src/libs/raceengineclient/raceengine.cpp
+- torcs-1.3.7/src/linux/main.cpp
 
 # How to build
 Rebuild TORCS
