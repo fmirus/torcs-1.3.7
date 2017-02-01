@@ -65,7 +65,7 @@ int main(int argc, char const *argv[])
 
     // Setup zmq
     static zmq::context_t context(1);
-    static zmq::socket_t socket(context, ZMQ_REP);
+    static zmq::socket_t socket(context, ZMQ_PAIR);
     printf("binding to socket\n");
     socket.bind("tcp://*:5555");
     printf("done\n");
@@ -92,7 +92,7 @@ int main(int argc, char const *argv[])
                    screenRGB->imageData[(h*image_width+w)*3+0]=shared->data[((image_height-h-1)*image_width+w)*3+2];
                 }
             }
-            printf("---screenRGB read complete.\n");
+            //printf("---screenRGB read complete.\n");
             // Resize image and send it as protobuf message
             cvResize(screenRGB, resizeRGB);
             cvSplit(resizeRGB, out_blue, out_green, out_red, NULL);
@@ -110,22 +110,22 @@ int main(int argc, char const *argv[])
             torcs_data.add_width(resize_width);
             torcs_data.add_height(resize_height);
             torcs_data.add_save_flag(shared->save_flag);
-            cout << "torcs_data shape: [" << torcs_data.width(0) << ", " << torcs_data.height(0) << "]" << endl;
+            //cout << "torcs_data shape: [" << torcs_data.width(0) << ", " << torcs_data.height(0) << "]" << endl;
 
             cvShowImage("Image from TORCS", resizeRGB);
 
             string serialized_data;
             torcs_data.SerializeToString(&serialized_data);
 
-            zmq::message_t request;
+            /*zmq::message_t request;
             socket.recv(&request);
             std::string replyMessage = std::string(static_cast<char *>(request.data()), request.size());
-            std::cout << "Recived from client: " + replyMessage << std::endl;
+            //std::cout << "Recived from client: " + replyMessage << std::endl;*/
 
             zmq::message_t reply(serialized_data.size());
             // std::cout << "checked OK!  2" << std::endl;
             memcpy((void*) reply.data(), serialized_data.data(), serialized_data.size());
-            std::cout << "---length of message to client: " << reply.size() << std::endl;
+            //std::cout << "---length of message to client: " << reply.size() << std::endl;
             socket.send(reply);
 
             shared->written=0;
