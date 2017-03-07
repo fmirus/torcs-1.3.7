@@ -24,8 +24,8 @@ using namespace cv;
 
 #define image_width 640
 #define image_height 480
-#define resize_width 280
-#define resize_height 210
+#define resize_width 640
+#define resize_height 480
 
 struct shared_use_st  
 {  
