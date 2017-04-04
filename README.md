@@ -1,4 +1,131 @@
-__TORCS 1.3.7 with [SCR patch](https://github.com/barisdemirdelen/scr-torcs-1.3.7) and [screenpipe Python client](https://bitbucket.org/missx/torcs-1.3.7/src/a876897aebe38867530ad5c622dcfdc3a0e2d58e/screenpipe/?at=master).__
+# **TORCS 1.3.7** 
+Version of TORCS 1.3.7 with [SCR patch](https://github.com/barisdemirdelen/scr-torcs-1.3.7) and an additional patch to send the current game image to another application via shared memory.
+
+## Installation
+
+This installation guide has only been tested with Ubuntu 16.04!
+
+### install torcs dependencies
+first we need to get some necessary debian packages
+
+```sudo apt-get install mesa-utils libalut-dev libvorbis-dev cmake libxrender-dev libxrender1 libxrandr-dev zlib1g-dev libpng16-dev```
+
+now check for openGL/DRI by running
+
+```glxinfo | grep direct```
+
+the result should look like
+
+```direct rendering: Yes```
+
+check for glut by running
+
+```dpkg -l | grep glut```
+
+if it is not installed run
+
+```sudo apt-get install freeglut3 freeglut3-dev```
+
+check for libpng by running
+
+```dpkg -l | grep png```
+
+
+#### install PLIB
+
+first we have to create a folder for all torcs-related stuff. Therefore, run the following commands
+
+```cd /your_desired_location/```
+
+```sudo mkdir torcs```
+
+```export TORCS_PATH=/your_desired_location/torcs```
+
+```cd $TORCS_PATH```
+
+install PLIB-dependencies
+
+```sudo apt-get install libxmu-dev libxmu6 libxi-dev```
+
+now download [PLIB 1.8.5](http://plib.sourceforge.net/download.html), unpack to the created directory and enter the plib folder by 
+
+```sudo tar xfvz /path_to_downloaded_files/plib-1.8.5.tar.gz```
+
+```cd plib-1.8.5```
+
+before we compile plib we need need to set some environment variables
+
+```export CFLAGS="-fPIC"```
+
+```export CPPFLAGS=$CFLAGS```
+
+```export CXXFLAGS=$CFLAGS```
+
+now we can configure and compile PLIB
+
+```./configure```
+
+```make```
+
+```sudo make install```
+
+just for safety, wen unset our environment variables again
+
+```export CFLAGS=```
+
+```export CPPFLAGS=```
+
+```export CXXFLAGS=```
+
+#### install openal
+let's enter our base directory again
+
+```cd $TORCS_PATH```
+
+now we download [openal 1.17.2](http://kcat.strangesoft.net/openal-releases/) and unpack it
+
+```sudo tar xfvj /path_to_downloaded_files/openal-soft-1.17.2.tar.bz2 ```
+
+we enter the build folder and compile openal
+
+```cd openal-soft-1.17.2/build```
+
+```sudo cmake ..```
+
+```sudo make```
+
+```sudo make install```
+
+### install TORCS
+enter your TORCS_PATH 
+
+```cd $TORCS_PATH```
+
+and clone this repository
+
+```git clone https://github.com/fmirus/torcs-1.3.7.git```
+
+now we enter our torcs folder 
+
+```cd torcs-1.3.7```
+
+now build we build TORCS and log the output to a text-files as TORCS does not interrupt the build on errors
+
+```make >& error.log```
+
+now open error.log with your favourite text editor and search for errors. If there are no errors you can proceed, otherwise you have to resolve.
+
+now we are ready to install torcs by running
+
+```sudo make install```
+
+also install the torcs data-files by running
+
+```sudo make datainstall```
+
+If you made it this far, you can delete the TORCS_PATH variable by ```unset TORCS_PATH``` and are now ready to go. Congratulations :-)
+
+# Original TORCS README:
 
 1.  Introduction
 2.  Documentation
@@ -15,7 +142,7 @@ __TORCS 1.3.7 with [SCR patch](https://github.com/barisdemirdelen/scr-torcs-1.3.
 12. TODO/Notes
 
 
-# 1.Introduction
+## 1. Introduction
 ---------------
 First a big welcome, I hope you will enjoy your ride:-)
 
@@ -33,7 +160,7 @@ Kind regards
 Bernhard
 
 
-# 2. Documentation
+## 2. Documentation
 ----------------
 You can find a variety of links on www.torcs.org (video tutorials about content
 creation/usage, written documentation like the robot tutorial, etc.). The TORCS
@@ -41,7 +168,7 @@ API and architecture documentation can be generated with Doxygen 1.8, run
 "make doc", the result can be found in doc/manual/api, point to index.html.
 
 
-#3. Non-Free content (in GPL sense)
+## 3. Non-Free content (in GPL sense)
 ----------------------------------
 Here the list with the directories containing non free content, look at the
 readme.txt for details:
@@ -49,7 +176,7 @@ readme.txt for details:
 - data/cars/models/kc-*
 
 
-#4. Track editor
+## 4. Track editor
 ---------------
 The track editor is not included in this distribution, you can get it from
 http://www.berniw.org/trb/download/trackeditor-0.6.2c.tar.bz2, the sources
@@ -57,7 +184,7 @@ are included in the jar. The sources are also available here:
 http://sourceforge.net/projects/trackeditor.
 
 
-#5. Linux Installation from Source
+## 5. Linux Installation from Source
 ---------------------------------
 - Requires plib 1.8.5, FreeGLUT or GLUT, be aware to compile plib with -fPIC
   on AMD64 if you run a 64 bit version of Linux. Be aware that maybe just
@@ -85,7 +212,7 @@ Command line arguments:
      to avoid "??" in the call stack)
 
 
-#6. Windows Installation from Source (Release version)
+## 6. Windows Installation from Source (Release version)
 -----------------------------------------------------
 - hint: you can have a release and a debug build side by side, the release
   version goes to "runtime" and the debug to "runtimed".
@@ -110,9 +237,9 @@ Command line arguments:
      training, see FAQ for details 
 
 
-##6.1 Windows Installation from Source, additional notes
+### 6.1 Windows Installation from Source, additional notes
 ------------------------------------------------------
-###6.1.1 VS 2005 Express (based on imported dsw), reported by Eric Espie:
+#### 6.1.1 VS 2005 Express (based on imported dsw), reported by Eric Espie:
 - Run up to the setup*.bat step in the above instructions, then open the TORCS.dsw
   file and do the following changes
 - in wtorcs -> Source Files (Solution explorer) exclude torcs.rc
@@ -122,21 +249,21 @@ Command line arguments:
         in "Configuration Properties -> Link Editor -> Entry : Ignore Specific Library"
         change LIBCD in LIBC if present.
 
-###6.1.2 VS 2005 Express (based on VS2008 sln), reported by Wolf-Dieter Beelitz:
+#### 6.1.2 VS 2005 Express (based on VS2008 sln), reported by Wolf-Dieter Beelitz:
 - Edit all vcproj (=xml) files and set the "version" from 9.00 to 8.00
 - Follow the instructions above.
 
-###6.1.3 VS 2008 Express, reported by Stacey Pritchett:
+#### 6.1.3 VS 2008 Express, reported by Stacey Pritchett:
 - in wtorcs -> Source Files (Solution explorer) exclude torcs.rc
 - Follow the instructions above.
 
-###6.1.4 VS 2012, reported by SteveO:
+#### 6.1.4 VS 2012, reported by SteveO:
 - In every project (except TORCS) add /SAFESEH:NO into the Additional Options
   (Properties-Configuration Properties-Linker-Command Line), see also
   http://msdn.microsoft.com/en-us/library/9a89h429.aspx.
 
 
-#7. Windows Installation from Source (Debug version)
+## 7. Windows Installation from Source (Debug version)
 ---------------------------------------------------
 - hint: you can have a debug and a release build side by side, the debug
   version goes to "runtimed" and the release to "runtime".
@@ -161,13 +288,13 @@ Command line arguments:
      training, see FAQ for details 
 
 
-#8. Testing
+## 8. Testing
 ----------
 If you find problems which should be already fixed or new ones please report them
 to the torcs-users mailing list.
 
 
-#9. Getting Help
+## 9. Getting Help
 ---------------
 During the game press F1. For more in depth information visit www.torcs.org,
 you find there a lot of information, look at the documentation section on
@@ -175,7 +302,7 @@ the left, have as well a look into the list of howto's. If you are stuck
 have a look into the FAQ to learn how and where to report a problem.
 
 
-#10. Running under Valgrind with Linux
+## 10. Running under Valgrind with Linux
 ------------------------------------
 First you need to build a debug version of TORCS, make sure that the CFLAGS,
 CPPFLAGS and CXXFLAGS environment variables are empty (usually they are). Then
@@ -213,7 +340,7 @@ Some additional notes:
   fine that the GUI and some handles are held permanent.
 
 
-#11. Changes
+## 11. Changes
 -----------
 
 Changes since 1.3.6
@@ -261,7 +388,7 @@ Changes since 1.3.6
 - Ensure that the third element just produces positive forces (Wolf-Dieter,
   Bernhard).
 
-#12. TODO/Notes
+## 12. TODO/Notes
 --------------
 
 TODO for 1.3.8 "worn & blown"
