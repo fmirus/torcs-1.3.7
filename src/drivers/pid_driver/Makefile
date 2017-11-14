@@ -20,7 +20,7 @@
 ROBOT       = pid_driver
 MODULE      = ${ROBOT}.so
 MODULEDIR   = drivers/${ROBOT}
-SOURCES     = ${ROBOT}.cpp
+SOURCES     = ${ROBOT}.cpp driver.cpp opponent.cpp
 
 SHIPDIR     = drivers/${ROBOT}
 SHIP        = ${ROBOT}.xml 155-DTM.rgb logo.rgb
