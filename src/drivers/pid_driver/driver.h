@@ -28,27 +28,28 @@ class Driver {
     /* callback functions called from TORCS */
     void initTrack(tTrack *t, void *carHandle, void **carParmHandle, tSituation *s);
     void newRace(tCarElt *car, tSituation *s);
-    void drive(tSituation *s);
-    int pitCommand(tSituation *s);
-    void endRace(tSituation *s);
+    void drive(tCarElt *car, tSituation *s);
+    int pitCommand(tCarElt *car, tSituation *s);
+    void endRace(tCarElt *car, tSituation *s);
 
     tCarElt *getCarPtr() { return car; }
     tTrack *getTrackPtr() { return track; }
     float getSpeed() { return speed; }
 
     float getAllowedSpeed(tTrackSeg *segment);
-    float getDistToSegEnd();
-    float getAccel();
+    float getDistToSegEnd(tCarElt *car);
+    float getAccel(tCarElt *car);
 
-    float getBrake();
-    int getGear();
+    float getBrake(tCarElt *car);
+    int getGear(tCarElt *car);
 
     void initCa();
+    void initCw();
 
   private:
     /* utility functions */
-    bool isStuck();
-    void update(tSituation *s);
+    bool isStuck(tCarElt *car);
+    void update(tCarElt *car, tSituation *s);
 
     /* per robot global data */
     int stuck;
@@ -77,6 +78,7 @@ class Driver {
     float mass;        /* mass of car + fuel */
     float CARMASS;     /* mass of the car only */
     float CA;          /* aerodynamic downforce coefficient */
+    float CW;      /* aerodynamic drag coefficient */
 
     float speed; /* speed in track direction */
 };

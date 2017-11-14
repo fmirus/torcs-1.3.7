@@ -1,7 +1,6 @@
 #! /bin/bash
 
 [ -z "$1" ] && exit 1
-[ ! -d "$1" ] && exit 1
 
 mkdir -p $1/drivers/human 2>/dev/null
 if [ ! -e  $1/drivers/human/car.xml ] || [ drivers/human/car.xml -nt $1/drivers/human/car.xml ]

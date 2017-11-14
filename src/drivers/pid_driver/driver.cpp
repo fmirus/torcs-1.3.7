@@ -22,6 +22,7 @@ void Driver::newRace(tCarElt *car, tSituation *s) {
     this->car = car;
     CARMASS = GfParmGetNum(car->_carHandle, SECT_CAR, PRM_MASS, NULL, 1000.0);
     initCa();
+    initCw();
 
     MAX_UNSTUCK_COUNT = int(UNSTUCK_TIME_LIMIT / RCM_MAX_DT_ROBOTS);
     stuck = 0;
@@ -32,12 +33,12 @@ void Driver::newRace(tCarElt *car, tSituation *s) {
 }
 
 /* Drive during race. */
-void Driver::drive(tSituation *s) {
-    update(s);
+void Driver::drive(tCarElt *car, tSituation *s) {
+    update(car, s);
 
     memset(&car->ctrl, 0, sizeof(tCarCtrl));
 
-    if (isStuck()) {
+    if (isStuck(car)) {
         car->ctrl.steer = -angle / car->_steerLock;
         car->ctrl.gear = -1;      // reverse gear
         car->ctrl.accelCmd = 0.5; // 50% accelerator pedal
@@ -46,10 +47,10 @@ void Driver::drive(tSituation *s) {
         float steerangle = angle - car->_trkPos.toMiddle / car->_trkPos.seg->width;
 
         car->ctrl.steer = steerangle / car->_steerLock;
-        car->ctrl.gear = getGear();
-        car->ctrl.brakeCmd = getBrake();
+        car->ctrl.gear = getGear(car);
+        car->ctrl.brakeCmd = getBrake(car);
         if (car->ctrl.brakeCmd == 0.0) {
-            car->ctrl.accelCmd = getAccel();
+            car->ctrl.accelCmd = getAccel(car);
         } else {
             car->ctrl.accelCmd = 0.0;
         }
@@ -57,7 +58,7 @@ void Driver::drive(tSituation *s) {
 }
 
 /* Update my private data every timestep */
-void Driver::update(tSituation *s) {
+void Driver::update(tCarElt *car, tSituation *s) {
     trackangle = RtTrackSideTgAngleL(&(car->_trkPos));
     angle = trackangle - car->_yaw;
     NORM_PI_PI(angle);
@@ -66,7 +67,7 @@ void Driver::update(tSituation *s) {
 }
 
 /* Compute the length to the end of the segment */
-float Driver::getDistToSegEnd() {
+float Driver::getDistToSegEnd(tCarElt *car) {
     if (car->_trkPos.seg->type == TR_STR) {
         return car->_trkPos.seg->length - car->_trkPos.toStart;
     } else {
@@ -75,7 +76,7 @@ float Driver::getDistToSegEnd() {
 }
 
 /* Compute gear */
-int Driver::getGear() {
+int Driver::getGear(tCarElt *car) {
     if (car->_gear <= 0)
         return 1;
     float gr_up = car->_gearRatio[car->_gear + car->_gearOffset];
@@ -96,7 +97,7 @@ int Driver::getGear() {
 }
 
 /* Compute fitting acceleration */
-float Driver::getAccel() {
+float Driver::getAccel(tCarElt *car) {
     float allowedspeed = getAllowedSpeed(car->_trkPos.seg);
     float gr = car->_gearRatio[car->_gear + car->_gearOffset];
     float rm = car->_enginerpmRedLine;
@@ -118,17 +119,17 @@ float Driver::getAllowedSpeed(tTrackSeg *segment) {
 }
 
 /* Set pitstop commands. */
-int Driver::pitCommand(tSituation *s) { return ROB_PIT_IM; /* return immediately */ }
+int Driver::pitCommand(tCarElt *car, tSituation *s) { return ROB_PIT_IM; /* return immediately */ }
 
 /* End of the current race */
-void Driver::endRace(tSituation *s) {}
+void Driver::endRace(tCarElt *car, tSituation *s) {}
 
-float Driver::getBrake() {
+float Driver::getBrake(tCarElt *car) {
     tTrackSeg *segptr = car->_trkPos.seg;
     float currentspeedsqr = car->_speed_x * car->_speed_x;
     float mu = segptr->surface->kFriction;
     float maxlookaheaddist = currentspeedsqr / (2.0 * mu * G);
-    float lookaheaddist = getDistToSegEnd();
+    float lookaheaddist = getDistToSegEnd(car);
     float allowedspeed = getAllowedSpeed(segptr);
     if (allowedspeed < car->_speed_x)
         return 1.0;
@@ -137,7 +138,8 @@ float Driver::getBrake() {
         allowedspeed = getAllowedSpeed(segptr);
         if (allowedspeed < car->_speed_x) {
             float allowedspeedsqr = allowedspeed * allowedspeed;
-            float brakedist = (currentspeedsqr - allowedspeedsqr) / (2.0 * mu * G);
+            float brakedist = mass * (currentspeedsqr - allowedspeedsqr) /
+                              (2.0 * (mu * G * mass + allowedspeedsqr * (CA * mu + CW)));
             if (brakedist > lookaheaddist) {
                 return 1.0;
             }
@@ -149,7 +151,7 @@ float Driver::getBrake() {
 }
 
 /* Check if I'm stuck */
-bool Driver::isStuck() {
+bool Driver::isStuck(tCarElt *car) {
     if (fabs(angle) > MAX_UNSTUCK_ANGLE && car->_speed_x < MAX_UNSTUCK_SPEED &&
         fabs(car->_trkPos.toMiddle) > MIN_UNSTUCK_DIST) {
         if (stuck > MAX_UNSTUCK_COUNT && car->_trkPos.toMiddle * angle < 0.0) {
@@ -162,6 +164,13 @@ bool Driver::isStuck() {
         stuck = 0;
         return false;
     }
+}
+
+/* Compute aerodynamic drag coefficient CW */
+void Driver::initCw() {
+    float cx = GfParmGetNum(car->_carHandle, SECT_AERODYNAMICS, PRM_CX, (char *)NULL, 0.0);
+    float frontarea = GfParmGetNum(car->_carHandle, SECT_AERODYNAMICS, PRM_FRNTAREA, (char *)NULL, 0.0);
+    CW = 0.645 * cx * frontarea;
 }
 
 /* Compute aerodynamic downforce coefficient CA */
