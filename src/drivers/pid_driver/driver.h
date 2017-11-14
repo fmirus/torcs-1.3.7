@@ -43,6 +43,8 @@ class Driver {
     float getBrake(tCarElt *car);
     int getGear(tCarElt *car);
 
+    float filterABS(float brake);
+
     void initCa();
     void initCw();
 
@@ -69,6 +71,8 @@ class Driver {
     static const float FULL_ACCEL_MARGIN;
     static const float SHIFT;
     static const float SHIFT_MARGIN;
+    static const float ABS_SLIP;
+    static const float ABS_MINSPEED;
 
     /* track variables */
     tTrack *track;

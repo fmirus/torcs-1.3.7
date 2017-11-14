@@ -8,6 +8,8 @@ const float Driver::G = 9.81;                              /* [m/(s*s)] */
 const float Driver::FULL_ACCEL_MARGIN = 1.0;               /* [m/s] */
 const float Driver::SHIFT = 0.9;                           /* [-] (% of rpmredline) */
 const float Driver::SHIFT_MARGIN = 4.0;                    /* [m/s] */
+const float Driver::ABS_SLIP = 0.9;                        /* [-] range [0.95..0.3] */
+const float Driver::ABS_MINSPEED = 3.0;                    /* [m/s] */
 
 Driver::Driver(int index) { INDEX = index; }
 
@@ -48,7 +50,7 @@ void Driver::drive(tCarElt *car, tSituation *s) {
 
         car->ctrl.steer = steerangle / car->_steerLock;
         car->ctrl.gear = getGear(car);
-        car->ctrl.brakeCmd = getBrake(car);
+        car->ctrl.brakeCmd = filterABS(getBrake(car));
         if (car->ctrl.brakeCmd == 0.0) {
             car->ctrl.accelCmd = getAccel(car);
         } else {
@@ -64,6 +66,21 @@ void Driver::update(tCarElt *car, tSituation *s) {
     NORM_PI_PI(angle);
 
     mass = CARMASS + car->_fuel;
+}
+
+/* Antilocking filter for brakes */
+float Driver::filterABS(float brake) {
+    if (car->_speed_x < ABS_MINSPEED)
+        return brake;
+    int i;
+    float slip = 0.0;
+    for (i = 0; i < 4; i++) {
+        slip += car->_wheelSpinVel(i) * car->_wheelRadius(i) / car->_speed_x;
+    }
+    slip = slip / 4.0;
+    if (slip < ABS_SLIP)
+        brake = brake * slip;
+    return brake;
 }
 
 /* Compute the length to the end of the segment */
