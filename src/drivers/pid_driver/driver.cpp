@@ -1,5 +1,7 @@
 #include "driver.h"
 
+#include <iostream>
+
 const float Driver::MAX_UNSTUCK_ANGLE = 30.0 / 180.0 * PI; /* [radians] */
 const float Driver::UNSTUCK_TIME_LIMIT = 2.0;              /* [s] */
 const float Driver::MAX_UNSTUCK_SPEED = 5.0;               /* [m/s] */
@@ -37,6 +39,11 @@ void Driver::newRace(tCarElt *car, tSituation *s) {
 /* Drive during race. */
 void Driver::drive(tCarElt *car, tSituation *s) {
     update(car, s);
+    for (int i = 0; i < opponents->getNOpponents(); i++) {
+        // std::cout << i << ": " << opponent[i].getState() << std::endl;
+        // std::cout << i << ": " << opponent[i].getSpeed() << std::endl;
+        std::cout << i << ": " << opponent[i].getDistance() << std::endl;
+    }
 
     memset(&car->ctrl, 0, sizeof(tCarCtrl));
 
@@ -66,6 +73,8 @@ void Driver::update(tCarElt *car, tSituation *s) {
     NORM_PI_PI(angle);
 
     mass = CARMASS + car->_fuel;
+    speed = Opponent::getSpeed(car);
+    opponents->update(s, this);
 }
 
 /* Antilocking filter for brakes */
