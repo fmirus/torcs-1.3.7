@@ -48,6 +48,11 @@ class Driver {
     void initCa();
     void initCw();
 
+    float getOpponentDistanceX(Opponent o);
+    float getOpponentDistanceY(Opponent o);
+    float getOpponentSpeedDiffX(Opponent o);
+    float getOpponentSpeedDiffY(Opponent o);
+
   private:
     /* utility functions */
     bool isStuck(tCarElt *car);

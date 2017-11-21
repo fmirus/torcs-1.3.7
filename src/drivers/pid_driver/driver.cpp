@@ -39,11 +39,17 @@ void Driver::newRace(tCarElt *car, tSituation *s) {
 /* Drive during race. */
 void Driver::drive(tCarElt *car, tSituation *s) {
     update(car, s);
+    std::cout << "Other cars ----" << std::endl;
     for (int i = 0; i < opponents->getNOpponents(); i++) {
-        // std::cout << i << ": " << opponent[i].getState() << std::endl;
-        // std::cout << i << ": " << opponent[i].getSpeed() << std::endl;
-        std::cout << i << ": " << opponent[i].getDistance() << std::endl;
+        std::cout << "State " << i << ": " << opponent[i].getState() << std::endl;
+        std::cout << "SpeedX " << i << ": " << getOpponentSpeedDiffX(opponent[i]) << std::endl;
+        std::cout << "SpeedY " << i << ": " << getOpponentSpeedDiffY(opponent[i]) << std::endl;
+        std::cout << "DistanceY " << i << ": " << getOpponentDistanceY(opponent[i]) << std::endl;
+        std::cout << "DistanceX " << i << ": " << getOpponentDistanceX(opponent[i]) << std::endl;
     }
+
+    std::cout << "My car ----" << std::endl;
+    std::cout << car->_trkPos.toMiddle << std::endl;
 
     memset(&car->ctrl, 0, sizeof(tCarCtrl));
 
@@ -75,6 +81,26 @@ void Driver::update(tCarElt *car, tSituation *s) {
     mass = CARMASS + car->_fuel;
     speed = Opponent::getSpeed(car);
     opponents->update(s, this);
+}
+
+float Driver::getOpponentDistanceX(Opponent o) { return o.getDistanceToMiddle() - car->_trkPos.toMiddle; }
+
+float Driver::getOpponentDistanceY(Opponent o) {
+    // float distance = sqrt(pow(o.getDistance(), 2) - pow(getOpponentDistanceX(o), 2));
+    float distance = o.getDistance() - getOpponentDistanceX(o);
+    // if(distance < 1.0){
+        // Otherwise it would just show nan
+        // return 0;
+    // }
+    return distance;
+}
+
+float Driver::getOpponentSpeedDiffX(Opponent o) {
+    return car->_speed_y - o.getSpeedY();
+}
+
+float Driver::getOpponentSpeedDiffY(Opponent o) {
+    return car->_speed_x - o.getSpeedX();
 }
 
 /* Antilocking filter for brakes */

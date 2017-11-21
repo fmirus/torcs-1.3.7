@@ -52,6 +52,9 @@ void Opponent::update(tSituation *s, Driver *driver) {
         distance += track->length;
     }
 
+    // Update distance to middle
+    distanceToMiddle = car->_trkPos.toMiddle;
+
     /* update speed in track direction */
     speed = Opponent::getSpeed(car);
     float cosa = speed / sqrt(car->_speed_X * car->_speed_X + car->_speed_Y * car->_speed_Y);

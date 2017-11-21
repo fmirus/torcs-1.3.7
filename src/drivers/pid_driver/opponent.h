@@ -40,6 +40,9 @@ class Opponent {
         float getSideDist() { return sidedist; }
         float getWidth() { return width; }
         float getSpeed() { return speed; }
+        float getSpeedX() {return car->_speed_X; }
+        float getSpeedY() {return car->_speed_Y; }
+        float getDistanceToMiddle() { return distanceToMiddle; }
 
         void update(tSituation *s, Driver *driver);
 
@@ -52,6 +55,7 @@ class Opponent {
         float catchdist;    /* distance needed to catch the opponent */
         float width;        /* the cars needed width on the track */
         float sidedist;     /* distance of center of gravity of the cars */
+        float distanceToMiddle;
         int state;          /* state bitmask of the opponent */
 
         /* class variables */
