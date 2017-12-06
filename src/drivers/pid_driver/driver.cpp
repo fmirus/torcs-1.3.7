@@ -1,6 +1,10 @@
 #include "driver.h"
 
+#include <cmath>
 #include <iostream>
+#ifndef M_PI
+#define M_PI (3.14159265358979323846)
+#endif
 
 const float Driver::MAX_UNSTUCK_ANGLE = 30.0 / 180.0 * PI; /* [radians] */
 const float Driver::UNSTUCK_TIME_LIMIT = 2.0;              /* [s] */
@@ -12,8 +16,24 @@ const float Driver::SHIFT = 0.9;                           /* [-] (% of rpmredli
 const float Driver::SHIFT_MARGIN = 4.0;                    /* [m/s] */
 const float Driver::ABS_SLIP = 0.9;                        /* [-] range [0.95..0.3] */
 const float Driver::ABS_MINSPEED = 3.0;                    /* [m/s] */
+const float Y_DIST_TO_MIDDLE = 5.0;
+const float GOAL_POS_Y = 20;
+const float GOAL_POS_X = 0;
 
-Driver::Driver(int index) { INDEX = index; }
+Driver::Driver(int index) {
+    float dt = 0.02;
+    float Kp = -0.5;
+    float Ki = -0.2;
+    float Kd = -0.0005;
+    _pidAcc = PidAcc(dt, Kp, Ki, Kd);
+    Kp = -0.3;
+    Ki = -0.1;
+    Kd = -0.005;
+    float G1 = 0.2;
+    float G2 = 0.8;
+    _pidSteer = PidSteer(dt, Kp, Ki, Kd, G1, G2, 12);
+    INDEX = index;
+}
 
 /* Called for every track change or new race. */
 void Driver::initTrack(tTrack *t, void *carHandle, void **carParmHandle, tSituation *s) {
@@ -42,33 +62,70 @@ void Driver::drive(tCarElt *car, tSituation *s) {
     std::cout << "Other cars ----" << std::endl;
     for (int i = 0; i < opponents->getNOpponents(); i++) {
         std::cout << "State " << i << ": " << opponent[i].getState() << std::endl;
-        std::cout << "SpeedX " << i << ": " << getOpponentSpeedDiffX(opponent[i]) << std::endl;
-        std::cout << "SpeedY " << i << ": " << getOpponentSpeedDiffY(opponent[i]) << std::endl;
+        if (opponent[i].getState() & OPP_FRONT) {
+            std::cout << "State " << i << ": "
+                      << "Front" << std::endl;
+        }
+        std::cout << "SpeedY " << i << ": " << getSpeed() << std::endl;
+        std::cout << "SpeedDiffX " << i << ": " << getOpponentSpeedDiffX(opponent[i]) << std::endl;
+        std::cout << "SpeedDiffY " << i << ": " << getOpponentSpeedDiffY(opponent[i]) << std::endl;
         std::cout << "DistanceY " << i << ": " << getOpponentDistanceY(opponent[i]) << std::endl;
         std::cout << "DistanceX " << i << ": " << getOpponentDistanceX(opponent[i]) << std::endl;
     }
 
-    std::cout << "My car ----" << std::endl;
-    std::cout << car->_trkPos.toMiddle << std::endl;
+    std::cout << "AI car ----" << std::endl;
+    std::cout << "To middle: " << car->_trkPos.toMiddle << std::endl;
+    std::cout << "To left: " << car->_trkPos.toLeft << std::endl;
+    std::cout << "To right: " << car->_trkPos.toRight << std::endl;
+    std::cout << angle << std::endl;
 
     memset(&car->ctrl, 0, sizeof(tCarCtrl));
 
-    if (isStuck(car)) {
-        car->ctrl.steer = -angle / car->_steerLock;
-        car->ctrl.gear = -1;      // reverse gear
-        car->ctrl.accelCmd = 0.5; // 50% accelerator pedal
-        car->ctrl.brakeCmd = 0.0; // no brakes
-    } else {
-        float steerangle = angle - car->_trkPos.toMiddle / car->_trkPos.seg->width;
+    // float steerangle = angle - car->_trkPos.toMiddle / car->_trkPos.seg->width;
+    // car->ctrl.steer = steerangle / car->_steerLock;
+    car->ctrl.gear = getGear(car);
+    handleSpeed();
+    handleSteering();
+}
 
-        car->ctrl.steer = steerangle / car->_steerLock;
-        car->ctrl.gear = getGear(car);
-        car->ctrl.brakeCmd = filterABS(getBrake(car));
-        if (car->ctrl.brakeCmd == 0.0) {
-            car->ctrl.accelCmd = getAccel(car);
-        } else {
-            car->ctrl.accelCmd = 0.0;
-        }
+void Driver::handleSteering() {
+    float currentPosX = getOpponentDistanceX(opponent[0]);
+    car->ctrl.steer = _pidSteer.step(GOAL_POS_X, 0.0, currentPosX, angle);
+    if (getSpeed() < 0)
+        car->ctrl.steer *= -1;
+    std::cout << "Steering: " << car->ctrl.steer << std::endl;
+}
+
+// This decides over the current speed
+void Driver::handleSpeed() {
+    // This is for abs
+    car->ctrl.brakeCmd = filterABS(getBrake(car));
+    if (car->ctrl.brakeCmd != 0.0) {
+        car->ctrl.accelCmd = 0.0;
+        return;
+    }
+
+    // Try to keep a certain distance
+    float currentPosY = getOpponentDistanceY(opponent[0]);
+    float maxAcc = getMaxAccel(car);
+    car->ctrl.accelCmd = _pidAcc.step(GOAL_POS_Y, currentPosY, maxAcc);
+    std::cout << "Acceleration: " << car->ctrl.accelCmd << std::endl;
+
+    // Check if car is upside down
+    if (angle > M_PI * 0.5) {
+        car->ctrl.accelCmd *= -1;
+    }
+
+    // Check if you need the reversed gear
+    if (car->ctrl.accelCmd < 0) {
+        car->ctrl.accelCmd *= -1;
+        car->ctrl.gear = -1;
+    }
+
+    // Check if you need to break to control the speed
+    if (car->ctrl.accelCmd < 0 && getOpponentDistanceY(opponent[0]) < GOAL_POS_Y) {
+        car->ctrl.gear = -1;
+        car->ctrl.brakeCmd = 1.0;
     }
 }
 
@@ -86,22 +143,15 @@ void Driver::update(tCarElt *car, tSituation *s) {
 float Driver::getOpponentDistanceX(Opponent o) { return o.getDistanceToMiddle() - car->_trkPos.toMiddle; }
 
 float Driver::getOpponentDistanceY(Opponent o) {
-    // float distance = sqrt(pow(o.getDistance(), 2) - pow(getOpponentDistanceX(o), 2));
-    float distance = o.getDistance() - getOpponentDistanceX(o);
-    // if(distance < 1.0){
-        // Otherwise it would just show nan
-        // return 0;
-    // }
-    return distance;
+    float distance = sqrt(pow(o.getDistance(), 2) - pow(getOpponentDistanceX(o), 2));
+    if (std::isnan(distance))
+        distance = 0;
+    return sgn(o.getDistance()) * distance + Y_DIST_TO_MIDDLE;
 }
 
-float Driver::getOpponentSpeedDiffX(Opponent o) {
-    return car->_speed_y - o.getSpeedY();
-}
+float Driver::getOpponentSpeedDiffX(Opponent o) { return car->_speed_y - o.getSpeedY(); }
 
-float Driver::getOpponentSpeedDiffY(Opponent o) {
-    return car->_speed_x - o.getSpeedX();
-}
+float Driver::getOpponentSpeedDiffY(Opponent o) { return car->_speed_x - o.getSpeedX(); }
 
 /* Antilocking filter for brakes */
 float Driver::filterABS(float brake) {
@@ -149,7 +199,7 @@ int Driver::getGear(tCarElt *car) {
 }
 
 /* Compute fitting acceleration */
-float Driver::getAccel(tCarElt *car) {
+float Driver::getMaxAccel(tCarElt *car) {
     float allowedspeed = getAllowedSpeed(car->_trkPos.seg);
     float gr = car->_gearRatio[car->_gear + car->_gearOffset];
     float rm = car->_enginerpmRedLine;

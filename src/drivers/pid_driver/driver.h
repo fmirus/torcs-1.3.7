@@ -13,9 +13,16 @@
 #include <tgf.h>
 #include <track.h>
 
+#include "pidAcc.h"
+#include "pidSteer.h"
 #include "opponent.h"
 class Opponents;
 class Opponent;
+
+// Needed to extract sgn
+template <typename T> int sgn(T val) {
+    return (T(0) < val) - (val < T(0));
+}
 
 class Driver {
   public:
@@ -38,7 +45,10 @@ class Driver {
 
     float getAllowedSpeed(tTrackSeg *segment);
     float getDistToSegEnd(tCarElt *car);
+    float getMaxAccel(tCarElt *car);
     float getAccel(tCarElt *car);
+    void handleSpeed();
+    void handleSteering();
 
     float getBrake(tCarElt *car);
     int getGear(tCarElt *car);
@@ -54,6 +64,9 @@ class Driver {
     float getOpponentSpeedDiffY(Opponent o);
 
   private:
+    PidAcc _pidAcc;
+    PidSteer _pidSteer;
+
     /* utility functions */
     bool isStuck(tCarElt *car);
     void update(tCarElt *car, tSituation *s);

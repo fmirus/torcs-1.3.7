@@ -7,6 +7,8 @@ float Opponent::BACKCOLLDIST = 50.0;   /* [m] distance to check for other cars *
 float Opponent::LENGTH_MARGIN = 0.0;   /* [m] safety margin, was 2.0 */
 float Opponent::SIDE_MARGIN = 1.0;     /* [m] safety margin */
 
+
+
 Opponent::Opponent() {}
 
 /* compute speed component parallel to the track */
