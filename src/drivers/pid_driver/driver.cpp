@@ -17,20 +17,20 @@ const float Driver::SHIFT_MARGIN = 4.0;                    /* [m/s] */
 const float Driver::ABS_SLIP = 0.9;                        /* [-] range [0.95..0.3] */
 const float Driver::ABS_MINSPEED = 3.0;                    /* [m/s] */
 const float Y_DIST_TO_MIDDLE = 5.0;
-const float GOAL_POS_Y = 20;
+const float GOAL_POS_Y = -20;
 const float GOAL_POS_X = 0;
 
 Driver::Driver(int index) {
     float dt = 0.02;
-    float Kp = -0.5;
-    float Ki = -0.2;
-    float Kd = -0.0005;
+    float Kp = -0.3;
+    float Ki = -0.3;
+    float Kd = -0.001;
     _pidAcc = PidAcc(dt, Kp, Ki, Kd);
-    Kp = -0.3;
+    Kp = -0.5;
     Ki = -0.1;
     Kd = -0.005;
-    float G1 = 0.2;
-    float G2 = 0.8;
+    float G1 = 0.3;
+    float G2 = 0.7;
     _pidSteer = PidSteer(dt, Kp, Ki, Kd, G1, G2, 12);
     INDEX = index;
 }
@@ -77,7 +77,7 @@ void Driver::drive(tCarElt *car, tSituation *s) {
     std::cout << "To middle: " << car->_trkPos.toMiddle << std::endl;
     std::cout << "To left: " << car->_trkPos.toLeft << std::endl;
     std::cout << "To right: " << car->_trkPos.toRight << std::endl;
-    std::cout << angle << std::endl;
+    std::cout << "Angle:" << angle << std::endl;
 
     memset(&car->ctrl, 0, sizeof(tCarCtrl));
 
@@ -112,7 +112,7 @@ void Driver::handleSpeed() {
     std::cout << "Acceleration: " << car->ctrl.accelCmd << std::endl;
 
     // Check if car is upside down
-    if (angle > M_PI * 0.5) {
+    if (std::abs(angle) > M_PI * 0.5) {
         car->ctrl.accelCmd *= -1;
     }
 

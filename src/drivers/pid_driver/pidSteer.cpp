@@ -29,7 +29,7 @@ float PidSteer::step(float setpoint1, float setpoint2, float currentVal1, float 
 
     // Calculate total output
     float output = Pout + Iout + Dout;
-    // std::cout << "P: " << Pout << ", I: " << Iout << " D: " << Dout << std::endl;
+    std::cout << "P: " << Pout << ", I: " << Iout << " D: " << Dout << std::endl;
 
     // Restrict to max/min
     if (output > _max)
