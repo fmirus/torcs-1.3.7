@@ -20,7 +20,7 @@ SOURCES     = ${ROBOT}.cpp optimal_line.cpp Trajectory.cpp TrackData.cpp
 
 SHIPDIR     = drivers/${ROBOT}
 SHIP        = ${ROBOT}.xml 155-DTM.rgb logo.rgb
-SHIPSUBDIRS =
+SHIPSUBDIRS = 
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}
 src-robots-test_bot_PKGFILES = $(shell find * -maxdepth 0 -type f -print)
