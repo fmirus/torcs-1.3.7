@@ -49,6 +49,7 @@ class Driver {
     float getAccel(tCarElt *car);
     void handleSpeed();
     void handleSteering();
+    float getGoalPosX();
 
     float getBrake(tCarElt *car);
     int getGear(tCarElt *car);

@@ -19,6 +19,7 @@ const float Driver::ABS_MINSPEED = 3.0;                    /* [m/s] */
 const float Y_DIST_TO_MIDDLE = 5.0;
 const float GOAL_POS_Y = -20;
 const float GOAL_POS_X = 0;
+const float MIN_DIST_X = 1;
 
 Driver::Driver(int index) {
     float dt = 0.02;
@@ -90,10 +91,22 @@ void Driver::drive(tCarElt *car, tSituation *s) {
 
 void Driver::handleSteering() {
     float currentPosX = getOpponentDistanceX(opponent[0]);
-    car->ctrl.steer = _pidSteer.step(GOAL_POS_X, 0.0, currentPosX, angle);
+    float goalX = getGoalPosX();
+    std::cout << "goalX: " << goalX << std::endl;
+    car->ctrl.steer = _pidSteer.step(goalX, 0.0, currentPosX, angle);
     if (getSpeed() < 0)
         car->ctrl.steer *= -1;
     std::cout << "Steering: " << car->ctrl.steer << std::endl;
+}
+
+float Driver::getGoalPosX(){
+    float dist = GOAL_POS_X + MIN_DIST_X * std::(1/getOpponentDistanceY(opponent[0]));
+    // Always overtake on the side of the front car, that directs towards the center of the street
+    if(car->_trkPos.toMiddle - getOpponentDistanceX(opponent[0]) < 0){
+        dist *= -1;
+    }
+        // std::cout << car->_trkPos.toMiddle - getOpponentDistanceX(opponent[0]) << std::endl;
+    return dist;
 }
 
 // This decides over the current speed
