@@ -18,21 +18,21 @@ const float Driver::ABS_SLIP = 0.9;                        /* [-] range [0.95..0
 const float Driver::ABS_MINSPEED = 3.0;                    /* [m/s] */
 const float Y_DIST_TO_MIDDLE = 5.0;
 const float GOAL_POS_Y = -20;
-const float GOAL_POS_X = 0;
-const float MIN_DIST_X = 1;
+const float GOAL_POS_X = -1;
+const float MIN_DIST_X = 4;
 
 Driver::Driver(int index) {
     float dt = 0.02;
     float Kp = -0.3;
-    float Ki = -0.3;
-    float Kd = -0.001;
-    _pidAcc = PidAcc(dt, Kp, Ki, Kd);
-    Kp = -0.5;
-    Ki = -0.1;
-    Kd = -0.005;
-    float G1 = 0.3;
-    float G2 = 0.7;
-    _pidSteer = PidSteer(dt, Kp, Ki, Kd, G1, G2, 12);
+    float Kd = -0.2;
+    float Ki = -0.001;
+    _pidAcc = PidAcc(dt, Kp, Kd, Ki);
+    Kp = -0.1;
+    Kd = -1.0;
+    Ki = -0.005;
+    float G1 = 0.2;
+    float G2 = 0.8;
+    _pidSteer = PidSteer(dt, Kp, Kd, Ki, G1, G2, 12);
     INDEX = index;
 }
 
@@ -99,13 +99,25 @@ void Driver::handleSteering() {
     std::cout << "Steering: " << car->ctrl.steer << std::endl;
 }
 
-float Driver::getGoalPosX(){
-    float dist = GOAL_POS_X + MIN_DIST_X * std::(1/getOpponentDistanceY(opponent[0]));
-    // Always overtake on the side of the front car, that directs towards the center of the street
-    if(car->_trkPos.toMiddle - getOpponentDistanceX(opponent[0]) < 0){
-        dist *= -1;
+float Driver::getGoalPosX() {
+    float dist = GOAL_POS_X;
+    // Only add a safety margin during overtake, if the goal position is closer than the safety distance
+    if (std::abs(GOAL_POS_X) < MIN_DIST_X) {
+        dist += sgn(GOAL_POS_X) * MIN_DIST_X *
+                std::pow((MIN_DIST_X + Y_DIST_TO_MIDDLE) / getOpponentDistanceY(opponent[0]), 2);
+
+        // Check if the distance becomes too large
+        if (std::abs(dist) > std::abs(MIN_DIST_X)) {
+            dist = sgn(GOAL_POS_X) * MIN_DIST_X;
+        }
     }
-        // std::cout << car->_trkPos.toMiddle - getOpponentDistanceX(opponent[0]) << std::endl;
+    // Always overtake on the side of the front car, that directs towards the center of the street
+    // if (car->_trkPos.toLeft < car->_trkPos.toRight &&
+    //     std::abs(getOpponentSpeedDiffY(opponent[0])) < std::abs(GOAL_POS_Y) * 0.75) {
+    //     dist *= sgn(dist);
+    // } else {
+    //     dist *= -1 * sgn(dist);
+    // }
     return dist;
 }
 

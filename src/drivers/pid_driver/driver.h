@@ -21,6 +21,7 @@ class Opponent;
 
 // Needed to extract sgn
 template <typename T> int sgn(T val) {
+    if(val == 0) return 1;
     return (T(0) < val) - (val < T(0));
 }
 
