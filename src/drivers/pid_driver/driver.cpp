@@ -18,8 +18,8 @@ const float Driver::ABS_SLIP = 0.9;                        /* [-] range [0.95..0
 const float Driver::ABS_MINSPEED = 3.0;                    /* [m/s] */
 const float Y_DIST_TO_MIDDLE = 5.0;
 const float GOAL_POS_Y = -20;
-const float GOAL_POS_X = -1;
-const float MIN_DIST_X = 4;
+const float GOAL_POS_X = 0;
+const float MIN_DIST = 4;
 
 Driver::Driver(int index) {
     float dt = 0.02;
@@ -60,30 +60,23 @@ void Driver::newRace(tCarElt *car, tSituation *s) {
 /* Drive during race. */
 void Driver::drive(tCarElt *car, tSituation *s) {
     update(car, s);
-    std::cout << "Other cars ----" << std::endl;
+    // std::cout << "Other cars ----" << std::endl;
     for (int i = 0; i < opponents->getNOpponents(); i++) {
-        std::cout << "State " << i << ": " << opponent[i].getState() << std::endl;
-        if (opponent[i].getState() & OPP_FRONT) {
-            std::cout << "State " << i << ": "
-                      << "Front" << std::endl;
-        }
-        std::cout << "SpeedY " << i << ": " << getSpeed() << std::endl;
-        std::cout << "SpeedDiffX " << i << ": " << getOpponentSpeedDiffX(opponent[i]) << std::endl;
-        std::cout << "SpeedDiffY " << i << ": " << getOpponentSpeedDiffY(opponent[i]) << std::endl;
+        // std::cout << "SpeedY " << i << ": " << getSpeed() << std::endl;
+        // std::cout << "SpeedDiffX " << i << ": " << getOpponentSpeedDiffX(opponent[i]) << std::endl;
+        // std::cout << "SpeedDiffY " << i << ": " << getOpponentSpeedDiffY(opponent[i]) << std::endl;
         std::cout << "DistanceY " << i << ": " << getOpponentDistanceY(opponent[i]) << std::endl;
         std::cout << "DistanceX " << i << ": " << getOpponentDistanceX(opponent[i]) << std::endl;
     }
 
-    std::cout << "AI car ----" << std::endl;
-    std::cout << "To middle: " << car->_trkPos.toMiddle << std::endl;
-    std::cout << "To left: " << car->_trkPos.toLeft << std::endl;
-    std::cout << "To right: " << car->_trkPos.toRight << std::endl;
-    std::cout << "Angle:" << angle << std::endl;
+    // std::cout << "AI car ----" << std::endl;
+    // std::cout << "To middle: " << car->_trkPos.toMiddle << std::endl;
+    // std::cout << "To left: " << car->_trkPos.toLeft << std::endl;
+    // std::cout << "To right: " << car->_trkPos.toRight << std::endl;
+    // std::cout << "Angle:" << angle << std::endl;
 
     memset(&car->ctrl, 0, sizeof(tCarCtrl));
 
-    // float steerangle = angle - car->_trkPos.toMiddle / car->_trkPos.seg->width;
-    // car->ctrl.steer = steerangle / car->_steerLock;
     car->ctrl.gear = getGear(car);
     handleSpeed();
     handleSteering();
@@ -92,32 +85,33 @@ void Driver::drive(tCarElt *car, tSituation *s) {
 void Driver::handleSteering() {
     float currentPosX = getOpponentDistanceX(opponent[0]);
     float goalX = getGoalPosX();
-    std::cout << "goalX: " << goalX << std::endl;
+    // std::cout << "goalX: " << goalX << std::endl;
     car->ctrl.steer = _pidSteer.step(goalX, 0.0, currentPosX, angle);
     if (getSpeed() < 0)
         car->ctrl.steer *= -1;
-    std::cout << "Steering: " << car->ctrl.steer << std::endl;
+    // std::cout << "Steering: " << car->ctrl.steer << std::endl;
 }
 
 float Driver::getGoalPosX() {
     float dist = GOAL_POS_X;
     // Only add a safety margin during overtake, if the goal position is closer than the safety distance
-    if (std::abs(GOAL_POS_X) < MIN_DIST_X) {
-        dist += sgn(GOAL_POS_X) * MIN_DIST_X *
-                std::pow((MIN_DIST_X + Y_DIST_TO_MIDDLE) / getOpponentDistanceY(opponent[0]), 2);
+    if (std::abs(GOAL_POS_X) < MIN_DIST) {
+        dist += sgn(GOAL_POS_X) * MIN_DIST *
+                std::pow((MIN_DIST + Y_DIST_TO_MIDDLE) / getOpponentDistanceY(opponent[0]), 2);
 
         // Check if the distance becomes too large
-        if (std::abs(dist) > std::abs(MIN_DIST_X)) {
-            dist = sgn(GOAL_POS_X) * MIN_DIST_X;
+        if (std::abs(dist) > std::abs(MIN_DIST)) {
+            dist = sgn(GOAL_POS_X) * MIN_DIST;
         }
     }
     // Always overtake on the side of the front car, that directs towards the center of the street
-    // if (car->_trkPos.toLeft < car->_trkPos.toRight &&
-    //     std::abs(getOpponentSpeedDiffY(opponent[0])) < std::abs(GOAL_POS_Y) * 0.75) {
-    //     dist *= sgn(dist);
-    // } else {
-    //     dist *= -1 * sgn(dist);
-    // }
+    if (getOpponentDistanceX(opponent[0]) + car->_trkPos.toMiddle > 0) {
+        dist *= sgn(dist);
+        // std::cout << "overtake right" << std::endl;
+    } else {
+        dist *= -1 * sgn(dist);
+        // std::cout << "overtake left" << std::endl;
+    }
     return dist;
 }
 
@@ -134,7 +128,7 @@ void Driver::handleSpeed() {
     float currentPosY = getOpponentDistanceY(opponent[0]);
     float maxAcc = getMaxAccel(car);
     car->ctrl.accelCmd = _pidAcc.step(GOAL_POS_Y, currentPosY, maxAcc);
-    std::cout << "Acceleration: " << car->ctrl.accelCmd << std::endl;
+    // std::cout << "Acceleration: " << car->ctrl.accelCmd << std::endl;
 
     // Check if car is upside down
     if (std::abs(angle) > M_PI * 0.5) {
@@ -150,6 +144,14 @@ void Driver::handleSpeed() {
     // Check if you need to break to control the speed
     if (car->ctrl.accelCmd < 0 && getOpponentDistanceY(opponent[0]) < GOAL_POS_Y) {
         car->ctrl.gear = -1;
+        car->ctrl.brakeCmd = 1.0;
+    }
+
+    // If you are too close to the front car and centered behind it, brake
+    if (getOpponentDistanceY(opponent[0]) > 0 && getOpponentDistanceY(opponent[0]) < Y_DIST_TO_MIDDLE * 1.25 &&
+        std::abs(getOpponentDistanceX(opponent[0])) < 1) {
+        // std::cout << "BREAK" << std::endl;
+        car->ctrl.accelCmd = 0.0;
         car->ctrl.brakeCmd = 1.0;
     }
 }
