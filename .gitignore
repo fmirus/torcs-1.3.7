@@ -34,3 +34,6 @@
 # Jonas added that
 *.depend
 *-bin
+export/*
+.torcs.rc
+src/libs/txml/gennmtab/gennmtab

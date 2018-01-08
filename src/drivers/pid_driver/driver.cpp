@@ -65,8 +65,9 @@ void Driver::drive(tCarElt *car, tSituation *s) {
         // std::cout << "SpeedY " << i << ": " << getSpeed() << std::endl;
         // std::cout << "SpeedDiffX " << i << ": " << getOpponentSpeedDiffX(opponent[i]) << std::endl;
         // std::cout << "SpeedDiffY " << i << ": " << getOpponentSpeedDiffY(opponent[i]) << std::endl;
-        std::cout << "DistanceY " << i << ": " << getOpponentDistanceY(opponent[i]) << std::endl;
-        std::cout << "DistanceX " << i << ": " << getOpponentDistanceX(opponent[i]) << std::endl;
+        // std::cout << "DistanceY " << i << ": " << getOpponentDistanceY(opponent[i]) << std::endl;
+        // std::cout << "DistanceX " << i << ": " << getOpponentDistanceX(opponent[i]) << std::endl;
+        std::cout << getOpponentDistanceX(opponent[i]) << ", " << getOpponentDistanceY(opponent[i]) << std::endl;
     }
 
     // std::cout << "AI car ----" << std::endl;
