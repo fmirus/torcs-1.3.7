@@ -517,27 +517,23 @@ drive(int index, tCarElt* car, tSituation *s)
         {
             float diffX = 0, diffY = 0;
 
-            if (false)
+            if (true)
             {
-                tTrackSeg *currentSeg = car->pub.trkPos.seg;
                 tTrkLocPos opPos = (closestOponent->pub.trkPos);
-                float opX, opY;
+                float opX, opY, ownX, ownY;
 
                 RtTrackLocal2Global(&opPos, &opX, &opY, 1);
-                RtTrackGlobal2Local(currentSeg, opX, opY, &opPos, 1);
+                RtTrackLocal2Global(&car->pub.trkPos, &ownX, &ownY, 1);
+                //RtTrackGlobal2Local(currentSeg, opX, opY, &opPos, 1);
 
-                diffX = car->pub.trkPos.toLeft - opPos.toLeft;
-                diffY = car->pub.trkPos.toStart - opPos.toStart;
+		diffX = car->pub.trkPos.toLeft - opPos.toLeft;
+		diffY = RtGetDistFromStart(car) - RtGetDistFromStart(closestOponent);
 
-            }
-            else
-            {
-                tTrkLocPos *opPos = &(closestOponent->pub.trkPos);
-
-                diffX = car->pub.trkPos.toLeft - opPos->toLeft;
-                diffY = car->pub.trkPos.toStart - opPos->toStart;
-
+		
                 writePositionLog(bot, diffX, diffY);
+                //diffX = car->pub.trkPos.toLeft - opPos.toLeft;
+                //diffY = car->pub.trkPos.toStart - opPos.toStart;
+
             }
 
 
@@ -625,7 +621,7 @@ void openPositionLog(tBot *bot)
     {
         //bot->distanceLog = fopen("relative_distance.csv", "a");
 	std::cout << "Hemic relative position:\n";
-	std::cout << "xDistance, yDistance\n";
+	std::cout << "distanceX,distanceY\n";
     }
 }
 
