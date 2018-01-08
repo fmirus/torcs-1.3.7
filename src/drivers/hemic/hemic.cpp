@@ -623,7 +623,9 @@ void openPositionLog(tBot *bot)
 {
     if (bot->distanceLog == NULL)
     {
-        bot->distanceLog = fopen("relative_distance.csv", "a");
+        //bot->distanceLog = fopen("relative_distance.csv", "a");
+	std::cout << "Hemic relative position:\n";
+	std::cout << "xDistance, yDistance\n";
     }
 }
 
@@ -636,6 +638,10 @@ void writePositionLog(tBot *bot, float x, float y)
                 "%f, %f\n",
                 x, y
                 );
+    }
+    else
+    {
+	std::cout << x << ", " << y << "\n";
     }
 }
 
