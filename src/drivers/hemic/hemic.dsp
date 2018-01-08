@@ -1,4 +1,4 @@
-# Microsoft Developer Studio Project File - Name="test_bot" - Package Owner=<4>
+# Microsoft Developer Studio Project File - Name="hemic" - Package Owner=<4>
 
 # Microsoft Developer Studio Generated Build File, Format Version 6.00
 
@@ -10,7 +10,7 @@
 
 
 
-CFG=test_bot - Win32 Debug
+CFG=hemic - Win32 Debug
 
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 
@@ -18,7 +18,7 @@ CFG=test_bot - Win32 Debug
 
 !MESSAGE 
 
-!MESSAGE NMAKE /f "test_bot.mak".
+!MESSAGE NMAKE /f "hemic.mak".
 
 !MESSAGE 
 
@@ -28,7 +28,7 @@ CFG=test_bot - Win32 Debug
 
 !MESSAGE 
 
-!MESSAGE NMAKE /f "test_bot.mak" CFG="test_bot - Win32 Debug"
+!MESSAGE NMAKE /f "hemic.mak" CFG="hemic - Win32 Debug"
 
 !MESSAGE 
 
@@ -36,9 +36,9 @@ CFG=test_bot - Win32 Debug
 
 !MESSAGE 
 
-!MESSAGE "test_bot - Win32 Release" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "hemic - Win32 Release" (based on "Win32 (x86) Dynamic-Link Library")
 
-!MESSAGE "test_bot - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "hemic - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
 
 !MESSAGE 
 
@@ -60,7 +60,7 @@ RSC=rc.exe
 
 
 
-!IF  "$(CFG)" == "test_bot - Win32 Release"
+!IF  "$(CFG)" == "hemic - Win32 Release"
 
 
 
@@ -86,9 +86,9 @@ RSC=rc.exe
 
 # PROP Target_Dir ""
 
-# ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "TEST_BOT_EXPORTS" /YX /FD /c
+# ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "HEMIC_EXPORTS" /YX /FD /c
 
-# ADD CPP /nologo /G5 /W3 /GX /O2 /I "../../../export/include" /I "../../windows/include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "TEST_BOT_EXPORTS" /YX /FD /c
+# ADD CPP /nologo /G5 /W3 /GX /O2 /I "../../../export/include" /I "../../windows/include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "HEMIC_EXPORTS" /YX /FD /c
 
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 
@@ -118,13 +118,13 @@ TargetDir=.\Release
 
 SOURCE="$(InputPath)"
 
-PostBuild_Cmds=copy $(TargetDir)\*.dll $(WkspDir)\runtime\drivers\test_bot
+PostBuild_Cmds=copy $(TargetDir)\*.dll $(WkspDir)\runtime\drivers\hemic
 
 # End Special Build Tool
 
 
 
-!ELSEIF  "$(CFG)" == "test_bot - Win32 Debug"
+!ELSEIF  "$(CFG)" == "hemic - Win32 Debug"
 
 
 
@@ -150,9 +150,9 @@ PostBuild_Cmds=copy $(TargetDir)\*.dll $(WkspDir)\runtime\drivers\test_bot
 
 # PROP Target_Dir ""
 
-# ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "TEST_BOT_EXPORTS" /YX /FD /GZ /c
+# ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "HEMIC_EXPORTS" /YX /FD /GZ /c
 
-# ADD CPP /nologo /G5 /W3 /Gm /GX /ZI /Od /I "../../../export/include" /I "../../windows/include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "TEST_BOT_EXPORTS" /YX /FD /GZ /c
+# ADD CPP /nologo /G5 /W3 /Gm /GX /ZI /Od /I "../../../export/include" /I "../../windows/include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "HEMIC_EXPORTS" /YX /FD /GZ /c
 
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 
@@ -182,7 +182,7 @@ TargetDir=.\Debug
 
 SOURCE="$(InputPath)"
 
-PostBuild_Cmds=copy $(TargetDir)\*.dll $(WkspDir)\runtimed\drivers\test_bot
+PostBuild_Cmds=copy $(TargetDir)\*.dll $(WkspDir)\runtimed\drivers\hemic
 
 # End Special Build Tool
 
@@ -196,9 +196,9 @@ PostBuild_Cmds=copy $(TargetDir)\*.dll $(WkspDir)\runtimed\drivers\test_bot
 
 
 
-# Name "test_bot - Win32 Release"
+# Name "hemic - Win32 Release"
 
-# Name "test_bot - Win32 Debug"
+# Name "hemic - Win32 Debug"
 
 # Begin Group "Source Files"
 
@@ -210,7 +210,7 @@ PostBuild_Cmds=copy $(TargetDir)\*.dll $(WkspDir)\runtimed\drivers\test_bot
 
 
 
-SOURCE=.\test_bot.cpp
+SOURCE=.\hemic.cpp
 
 # End Source File
 
@@ -218,7 +218,7 @@ SOURCE=.\test_bot.cpp
 
 
 
-SOURCE=.\test_bot.def
+SOURCE=.\hemic.def
 
 # End Source File
 

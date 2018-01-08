@@ -20,7 +20,7 @@
 #endif
 
 
-#include "test_bot.h"
+#include "hemic.h"
 
 
 static void initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSituation *s);
@@ -32,11 +32,16 @@ static int InitFuncPt(int index, void *pt);
 
 static tBot bots[NBBOTS];
 
+
+void openPositionLog(tBot *bot);
+void writePositionLog(tBot *bot, float x, float y);
+void closePositionLog(tBot *bot);
+
 /* 
  * Module entry point  
  */
 extern "C" int
-test_bot(tModInfo *modInfo)
+hemic(tModInfo *modInfo)
 {
     memset(modInfo, 0, NBBOTS * sizeof (tModInfo));
 
@@ -101,7 +106,7 @@ initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSitu
 static void
 newrace(int index, tCarElt* car, tSituation *s)
 {
-    std::cout << "test_bot.cpp: Version 0.07\n";
+    std::cout << "hemic.cpp: Version 0.08\n";
 
 
     if (index < 1 || index > NBBOTS)
@@ -119,6 +124,8 @@ newrace(int index, tCarElt* car, tSituation *s)
     bot->hasLaunched = false;
     bot->slipDist = 0;
     bot->throttlingI = THROTTLING_I_INIT;
+
+    openPositionLog(bot);
 }
 
 /* Drive during race. */
@@ -141,7 +148,7 @@ drive(int index, tCarElt* car, tSituation *s)
     const float SC = 1.0;
 
     tCarElt *closestOponent = 0x00;
-    float closestOpDist = 100;
+    float closestOpDist = 1e9f;
     int ncars = s->raceInfo.ncars;
 
     tdble cX, cY, oX, oY;
@@ -450,6 +457,8 @@ drive(int index, tCarElt* car, tSituation *s)
         //std::ofstream logfile;
         //logfile.open ("~/test_bot.log", std::ofstream::out | std::ofstream::app);
 
+/*
+
         std::cout << std::showpos << std::setprecision(3) << std::fixed
                 << "off=" << std::setw(3) << offset
                 << std::noshowpos
@@ -467,6 +476,7 @@ drive(int index, tCarElt* car, tSituation *s)
                 //<< ", friction=" << car->_trkPos.seg->surface->kFriction
                 << "\n";
 
+*/
 
         bot->lastManeuver = maneuver;
 
@@ -491,8 +501,8 @@ drive(int index, tCarElt* car, tSituation *s)
             othCt = c->race.curTime;
             othBL = c->race.timeBehindLeader;
         }
-        
-        if(ownCt == 0)
+
+        if (ownCt == 0)
         {
             bot->otherTime = othCt;
             bot->ownTime = othCt + car->race.timeBehindLeader;
@@ -502,7 +512,40 @@ drive(int index, tCarElt* car, tSituation *s)
             bot->ownTime = ownCt;
             bot->otherTime = ownCt + othBL;
         }
-        
+
+        if (closestOponent != NULL)
+        {
+            float diffX = 0, diffY = 0;
+
+            if (false)
+            {
+                tTrackSeg *currentSeg = car->pub.trkPos.seg;
+                tTrkLocPos opPos = (closestOponent->pub.trkPos);
+                float opX, opY;
+
+                RtTrackLocal2Global(&opPos, &opX, &opY, 1);
+                RtTrackGlobal2Local(currentSeg, opX, opY, &opPos, 1);
+
+                diffX = car->pub.trkPos.toLeft - opPos.toLeft;
+                diffY = car->pub.trkPos.toStart - opPos.toStart;
+
+            }
+            else
+            {
+                tTrkLocPos *opPos = &(closestOponent->pub.trkPos);
+
+                diffX = car->pub.trkPos.toLeft - opPos->toLeft;
+                diffY = car->pub.trkPos.toStart - opPos->toStart;
+
+                writePositionLog(bot, diffX, diffY);
+            }
+
+
+
+        }
+
+
+
         //logfile.close();
     }
 
@@ -567,11 +610,47 @@ shutdown(int index)
     fprintf(
             f,
             "%f, %f\n",
-            bots[0].ownTime, bots[0].otherTime
+            bots[index].ownTime, bots[index].otherTime
             );
 
     fclose(f);
+
+
+    closePositionLog(bots + index - 1);
 }
 
+void openPositionLog(tBot *bot)
+{
+    if (bot->distanceLog == NULL)
+    {
+        //bot->distanceLog = fopen("relative_distance.csv", "a");
+	std::cout << "Hemic relative position:\n";
+	std::cout << "xDistance, yDistance\n";
+    }
+}
 
+void writePositionLog(tBot *bot, float x, float y)
+{
+    if (bot->distanceLog != NULL)
+    {
+        fprintf(
+                bot->distanceLog,
+                "%f, %f\n",
+                x, y
+                );
+    }
+    else
+    {
+	std::cout << x << ", " << y << "\n";
+    }
+}
 
+void closePositionLog(tBot *bot)
+{
+    if (bot->distanceLog != NULL)
+    {
+        fclose(bot->distanceLog);
+        bot->distanceLog = NULL;
+    }
+
+}
