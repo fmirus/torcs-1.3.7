@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    file                 : test_bot.xml
-    created              : Do 2. Nov 08:49:38 CET 2017
+    file                 : hemic.xml
+    created              : Mo 8. Jan 00:39:15 CET 2018
     copyright            : (C) 2002 Jonas Natzer, Michael Heinrich
 -->
 
@@ -11,20 +11,16 @@
 <!--    (at your option) any later version.                                   -->
 
 <!DOCTYPE params SYSTEM "../../libs/tgf/params.dtd">
-<params name="Hemic" type="robotdef">
+<params name="hemic" type="robotdef">
   <section name="Robots">
     <section name="index">
       <section name="1">
-	<attstr name="name" val="Hemic"></attstr>
+	<attstr name="name" val="hemic"></attstr>
 	<attstr name="desc" val=""></attstr>
 	<attstr name="team" val=""></attstr>
 	<attstr name="author" val="Jonas Natzer, Michael Heinrich"></attstr>
-	<!--<attstr name="car name" val="pw-corollawrc"></attstr>
-	<attstr name="category" val="Offroad-4WD-GrA"></attstr>-->
-        <attstr name="car name" val="155-DTM"></attstr>
+	<attstr name="car name" val="155-DTM"></attstr>
 	<attstr name="category" val="Track-4WD-GrB"></attstr>
-        <!--<attstr name="car name" val="car1-ow1"/>
-	<attstr name="category" val="ow1"></attstr>-->
 	<attnum name="race number" val="0"></attnum>
 	<attnum name="red" val="1.0"></attnum>
 	<attnum name="green" val="1.0"></attnum>

@@ -857,7 +857,8 @@ TrackModel::propagateRationalLimit(float maxG)
 
         // maximum acceleration is the sum of lateral
         // acceleration and brake acceleration
-        float aBrake = sqrt(aLim * aLim - ((v0 * v0) / r));
+        float aBrake = sqrt(aLim * aLim - ((v0 * v0 * v0 * v0) / (r * r)));
+        //float aBrake = sqrt(aLim * aLim - ((v0 * v0) / r));
 
         float x = -len;
         float a0 = -aBrake;

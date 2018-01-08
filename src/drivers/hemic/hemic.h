@@ -5,14 +5,14 @@
  */
 
 /* 
- * File:   test_bot.h
+ * File:   HEMIC.h
  * Author: michaelheinrich
  *
  * Created on 26. November 2017, 23:30
  */
 
-#ifndef TEST_BOT_H
-#define TEST_BOT_H
+#ifndef HEMIC_H
+#define HEMIC_H
 
 #include <stdio.h>
 #include <stdlib.h> 
@@ -37,9 +37,9 @@
 #include "optimal_line.h"
 
 
-#define MAX_BREAK_G 1.60
+#define MAX_BREAK_G 1.50
 #define MAX_LATERAL_G 1.60
-#define SUCTION_G_PER_M_SS (0.5 / 1000.0)
+#define SUCTION_G_PER_M_SS (0.4 / 1000.0)
 
 
 #define COLLISION_WARNING_DIST 10
@@ -67,6 +67,8 @@
 //#define NOMINAL_REL_POSITION 0.5
 #define NOMINAL_REL_POSITION 0.5
 
+//#define HEMIC_DEBUG 1
+
 #define NBBOTS 1
 
 typedef struct Bot
@@ -85,7 +87,9 @@ typedef struct Bot
     float ownTime;
     float otherTime;
     
+    FILE *distanceLog;
+    
 } tBot;
 
-#endif /* TEST_BOT_H */
+#endif /* HEMIC_H */
 
