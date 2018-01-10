@@ -37,3 +37,5 @@
 export/*
 .torcs.rc
 src/libs/txml/gennmtab/gennmtab
+Make-config
+src/doc/torcsdoc.conf
