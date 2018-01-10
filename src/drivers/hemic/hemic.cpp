@@ -409,9 +409,9 @@ drive(int index, tCarElt* car, tSituation *s)
     car->ctrl.gear = gear;
 
 
-    bool moves = speed > 1;
+    bool moves = speed > 1 || speedLim <= 5;
 
-    if (moves)
+    if (moves || throttling == 0)
     {
         bot->lastMoveStep = bot->currentStep;
         bot->hasLaunched = true;
