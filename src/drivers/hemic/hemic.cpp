@@ -37,8 +37,8 @@ void openPositionLog(tBot *bot);
 void writePositionLog(tBot *bot, float x, float y);
 void closePositionLog(tBot *bot);
 
-/* 
- * Module entry point  
+/*
+ * Module entry point
  */
 extern "C" int
 hemic(tModInfo *modInfo)
@@ -529,7 +529,7 @@ drive(int index, tCarElt* car, tSituation *s)
 		diffX = car->pub.trkPos.toLeft - opPos.toLeft;
 		diffY = RtGetDistFromStart(car) - RtGetDistFromStart(closestOponent);
 
-		
+
                 writePositionLog(bot, diffX, diffY);
                 //diffX = car->pub.trkPos.toLeft - opPos.toLeft;
                 //diffY = car->pub.trkPos.toStart - opPos.toStart;
@@ -635,10 +635,10 @@ void writePositionLog(tBot *bot, float x, float y)
                 x, y
                 );
     }
-    else
-    {
-	std::cout << x << ", " << y << "\n";
-    }
+    // else
+    // {
+	// std::cout << x << ", " << y << "\n";
+    // }
 }
 
 void closePositionLog(tBot *bot)

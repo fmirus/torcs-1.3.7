@@ -61,14 +61,14 @@ void Driver::newRace(tCarElt *car, tSituation *s) {
 void Driver::drive(tCarElt *car, tSituation *s) {
     update(car, s);
     // std::cout << "Other cars ----" << std::endl;
-    for (int i = 0; i < opponents->getNOpponents(); i++) {
+    // for (int i = 0; i < opponents->getNOpponents(); i++) {
         // std::cout << "SpeedY " << i << ": " << getSpeed() << std::endl;
         // std::cout << "SpeedDiffX " << i << ": " << getOpponentSpeedDiffX(opponent[i]) << std::endl;
         // std::cout << "SpeedDiffY " << i << ": " << getOpponentSpeedDiffY(opponent[i]) << std::endl;
         // std::cout << "DistanceY " << i << ": " << getOpponentDistanceY(opponent[i]) << std::endl;
         // std::cout << "DistanceX " << i << ": " << getOpponentDistanceX(opponent[i]) << std::endl;
-        std::cout << getOpponentDistanceX(opponent[i]) << ", " << getOpponentDistanceY(opponent[i]) << std::endl;
-    }
+        // std::cout << getOpponentDistanceX(opponent[i]) << ", " << getOpponentDistanceY(opponent[i]) << std::endl;
+    // }
 
     // std::cout << "AI car ----" << std::endl;
     // std::cout << "To middle: " << car->_trkPos.toMiddle << std::endl;
