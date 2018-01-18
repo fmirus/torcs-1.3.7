@@ -106,7 +106,7 @@ initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSitu
 static void
 newrace(int index, tCarElt* car, tSituation *s)
 {
-    std::cout << "hemic.cpp: Version 0.08\n";
+    std::cout << "hemic.cpp: Version 0.09\n";
 
 
     if (index < 1 || index > NBBOTS)
@@ -124,6 +124,7 @@ newrace(int index, tCarElt* car, tSituation *s)
     bot->hasLaunched = false;
     bot->slipDist = 0;
     bot->throttlingI = THROTTLING_I_INIT;
+    bot->lastRelDist = 0;
 
     openPositionLog(bot);
 }
@@ -183,7 +184,8 @@ drive(int index, tCarElt* car, tSituation *s)
     }
 
     float maneuver = (1 - MANEUVER_INNOVATION) * bot->lastManeuver;
-    float emergency = 0;
+    float frontEmergency = 0;
+    float backEmergency = 0;
     float threatSpeed = 0;
 
     if (closestOponent != 0x00 && closestOpDist < COLLISION_WARNING_DIST)
@@ -197,8 +199,8 @@ drive(int index, tCarElt* car, tSituation *s)
         dir = dir < 0 ? -1 : dir;
 
         bool isBehind = car->race.pos < closestOponent->race.pos;
-        bool isCollisionImmenent = (closestOpDist < COLLISION_IMMINENT_DIST)
-                && !isBehind;
+        bool isCollisionImmenent = (closestOpDist < COLLISION_IMMINENT_DIST);
+        
 
         float intrusion = dir * (COLLISION_WARNING_DIST - closestOpDist)
                 / (COLLISION_WARNING_DIST - COLLISION_IMMINENT_DIST);
@@ -220,17 +222,11 @@ drive(int index, tCarElt* car, tSituation *s)
         dv.x = vOpp.x - vCar.x;
         dv.y = vOpp.y - vCar.y;
 
-        threatSpeed = -(dv.x * dirV.x + dv.y * dirV.y);
-
-        if (threatSpeed > 0.5 * EMERGENCY_BRAKE_DV)
-        {
-            emergency = (2 * (threatSpeed / EMERGENCY_BRAKE_DV)) - 1;
-
-            emergency = emergency > 1 ? 1 : emergency;
-            emergency = emergency < 0 ? 0 : emergency;
-        }
-
-        emergency = isCollisionImmenent ? 1.0 : 0.0;
+        frontEmergency = isCollisionImmenent && !isBehind ? 1.0 : 0.0;
+        
+#if AVOID_ROGUE_DRIVER
+        backEmergency = isCollisionImmenent && isBehind ? 1.0 : 0.0;
+#endif
 
         /*
         std::cout << "COLLISION_WARNING: intrusion=" << intrusion <<
@@ -279,17 +275,29 @@ drive(int index, tCarElt* car, tSituation *s)
     float speed = car->pub.speed;
     float speedLim = bot->trackModel.getMaximumSpeed(&(car->_trkPos));
 
+    float relDist = 0;
+
+    if (closestOponent != NULL)
+    {
+        relDist = closestOponent->race.distRaced - car->race.distRaced;
+    }
+    
+    float deltaDist = relDist - bot->lastRelDist;
+    bot->lastRelDist = relDist;
+    
+
     float relPosition = (car->race.pos - 1) / (float) (ncars - 1);
 
     float difPos = -(NOMINAL_REL_POSITION - relPosition);
 
     bot->throttlingI += THROTTLING_I * difPos;
     float throttlingP = THROTTLING_P * difPos;
+    float throttlingD = THROTTLING_D * deltaDist;
 
     throttlingP = throttlingP > THROTTLING_P_LIM ? THROTTLING_P_LIM : throttlingP;
     throttlingP = throttlingP < -THROTTLING_P_LIM ? -THROTTLING_P_LIM : throttlingP;
 
-    float throttling = throttlingP + bot->throttlingI;
+    float throttling = throttlingP + bot->throttlingI + throttlingD;
 
     throttling = throttling > MAX_THROTTLING ? MAX_THROTTLING : throttling;
     throttling = throttling < MIN_THROTTLING ? MIN_THROTTLING : throttling;
@@ -440,9 +448,14 @@ drive(int index, tCarElt* car, tSituation *s)
 
     car->ctrl.accelCmd *= throttling;
 
-    float accCmd = emergency * 0.0 + (1 - emergency) * car->ctrl.accelCmd;
-    float brakeCmd = (1 - emergency) * car->ctrl.brakeCmd + emergency * 1.0;
-
+    float accCmd = frontEmergency * 0.0 + (1 - frontEmergency) * car->ctrl.accelCmd;
+    float brakeCmd = (1 - frontEmergency) * car->ctrl.brakeCmd + frontEmergency * 1.0;
+    
+    if(backEmergency > 0)
+    {
+        accCmd = backEmergency * 1.0 + (1 - backEmergency) * accCmd;
+        brakeCmd = backEmergency * 0.0 + (1 - backEmergency) * brakeCmd;
+    }
 
     car->ctrl.accelCmd = accCmd;
     car->ctrl.brakeCmd = brakeCmd;
@@ -457,26 +470,25 @@ drive(int index, tCarElt* car, tSituation *s)
         //std::ofstream logfile;
         //logfile.open ("~/test_bot.log", std::ofstream::out | std::ofstream::app);
 
-/*
+#if HEMIC_LOG_CONTROLS
 
-        std::cout << std::showpos << std::setprecision(3) << std::fixed
-                << "off=" << std::setw(3) << offset
-                << std::noshowpos
-                << ", acc=" << std::setw(3) << car->ctrl.accelCmd
-                << ", brk=" << std::setw(3) << car->ctrl.brakeCmd
-                //<< ", spd=" << std::setw(3) << speed
-                << ", spdLim=" << std::setw(3) << speedLim
-                << ", thr=" << std::setw(3) << throttling
-                << ", thrP=" << std::setw(3) << throttlingP
-                << ", thrI=" << std::setw(3) << bot->throttlingI
-                << ", relPos=" << std::setw(3) << relPosition
-                << ", threatSpd=" << std::setw(3) << threatSpeed
-                << ", emergency=" << std::setw(3) << emergency
+                std::cout << std::showpos << std::setprecision(3) << std::fixed
+                        << "off=" << std::setw(3) << offset
+                        << std::noshowpos
+                        << ", acc=" << std::setw(3) << car->ctrl.accelCmd
+                        << ", brk=" << std::setw(3) << car->ctrl.brakeCmd
+                        //<< ", spd=" << std::setw(3) << speed
+                        << ", spdLim=" << std::setw(3) << speedLim
+                        << ", thr=" << std::setw(3) << throttling
+                        << std::showpos
+                        << ", thrP=" << std::setw(3) << throttlingP
+                        << ", thrI=" << std::setw(3) << bot->throttlingI
+                        << ", thrD=" << std::setw(3) << throttlingD
+                        << ", relPos=" << std::setw(3) << relPosition
+                        << ", maneuver=" << std::setw(3) << maneuver
+                        << "\n";
 
-                //<< ", friction=" << car->_trkPos.seg->surface->kFriction
-                << "\n";
-
-*/
+#endif
 
         bot->lastManeuver = maneuver;
 
@@ -513,31 +525,16 @@ drive(int index, tCarElt* car, tSituation *s)
             bot->otherTime = ownCt + othBL;
         }
 
+
         if (closestOponent != NULL)
         {
             float diffX = 0, diffY = 0;
 
-            if (true)
-            {
-                tTrkLocPos opPos = (closestOponent->pub.trkPos);
-                float opX, opY, ownX, ownY;
 
-                RtTrackLocal2Global(&opPos, &opX, &opY, 1);
-                RtTrackLocal2Global(&car->pub.trkPos, &ownX, &ownY, 1);
-                //RtTrackGlobal2Local(currentSeg, opX, opY, &opPos, 1);
+            diffX = car->pub.trkPos.toLeft - closestOponent->pub.trkPos.toLeft;
+            diffY = car->race.distRaced - closestOponent->race.distRaced;
 
-		diffX = car->pub.trkPos.toLeft - opPos.toLeft;
-		diffY = RtGetDistFromStart(car) - RtGetDistFromStart(closestOponent);
-
-
-                writePositionLog(bot, diffX, diffY);
-                //diffX = car->pub.trkPos.toLeft - opPos.toLeft;
-                //diffY = car->pub.trkPos.toStart - opPos.toStart;
-
-            }
-
-
-
+            writePositionLog(bot, diffX, diffY);
         }
 
 
@@ -620,13 +617,14 @@ void openPositionLog(tBot *bot)
     if (bot->distanceLog == NULL)
     {
         //bot->distanceLog = fopen("relative_distance.csv", "a");
-	std::cout << "Hemic relative position:\n";
-	std::cout << "distanceX,distanceY\n";
+        std::cout << "Hemic relative position:\n";
+        std::cout << "distanceX,distanceY\n";
     }
 }
 
 void writePositionLog(tBot *bot, float x, float y)
 {
+#if HEMIC_LOG_REL_POS
     if (bot->distanceLog != NULL)
     {
         fprintf(
@@ -635,10 +633,12 @@ void writePositionLog(tBot *bot, float x, float y)
                 x, y
                 );
     }
-    // else
-    // {
-	// std::cout << x << ", " << y << "\n";
-    // }
+    else
+    {
+        std::cout << x << ", " << y << "\n";
+    }
+    
+#endif
 }
 
 void closePositionLog(tBot *bot)
