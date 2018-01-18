@@ -42,7 +42,7 @@
 #define SUCTION_G_PER_M_SS (0.4 / 1000.0)
 
 
-#define COLLISION_WARNING_DIST 10
+#define COLLISION_WARNING_DIST 20
 #define COLLISION_AVOID_GAIN 5
 
 /**
@@ -56,9 +56,10 @@
 #define UNSTUCKING_STEPS 90
 #define MANEUVER_INNOVATION 0.1
 
-#define THROTTLING_I_INIT 0.8
+#define THROTTLING_I_INIT 0.5
 #define THROTTLING_P 1.0
 #define THROTTLING_I 0.0003
+#define THROTTLING_D 1
 
 #define THROTTLING_P_LIM 0.1
 
@@ -68,6 +69,18 @@
 #define NOMINAL_REL_POSITION 0.5
 
 //#define HEMIC_DEBUG 1
+
+#define HEMIC_LOG_CONTROLS 0
+#define HEMIC_LOG_REL_POS 0
+
+/**
+ * Any reasonable driver would attempt not to crash into a car that is directly
+ * in front of it. However some drivers do not take any care of this logic,
+ * so this option enables an evasive maneuver if a crash into our rear end is
+ * immenent, regardless of throttling considerations.
+ */
+#define AVOID_ROGUE_DRIVER 1
+
 
 #define NBBOTS 1
 
@@ -81,6 +94,7 @@ typedef struct Bot
     int remainingBackwardSteps;
     bool hasLaunched;
     
+    float lastRelDist;
     float throttlingI;
     float slipDist;
     
