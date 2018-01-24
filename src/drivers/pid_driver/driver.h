@@ -44,12 +44,19 @@ class Driver {
     tTrack *getTrackPtr() { return track; }
     float getSpeed() { return speed; }
 
+    // Each track segment allows a different maximum speed, e.g. curves
     float getAllowedSpeed(tTrackSeg *segment);
+    // Get Distance to the end of the current segment. Needed to evaluate driver
     float getDistToSegEnd(tCarElt *car);
+    // Get the maximal allowed acceleration for the current situation
     float getMaxAccel(tCarElt *car);
+    // Wrapper function for the acceleration PID controller
     float getAccel(tCarElt *car);
+    // Set best acceleration for the current situation
     void handleSpeed();
+    // Set steering for the current situation
     void handleSteering();
+    // Calculates an updated x distance to the reference car including a safety margin
     float getGoalPosX();
 
     float getBrake(tCarElt *car);
@@ -60,13 +67,16 @@ class Driver {
     void initCa();
     void initCw();
 
+    // Helper functions for distance and speed measurements
     float getOpponentDistanceX(Opponent o);
     float getOpponentDistanceY(Opponent o);
     float getOpponentSpeedDiffX(Opponent o);
     float getOpponentSpeedDiffY(Opponent o);
 
   private:
+    // The PID controller for acceleration
     PidAcc _pidAcc;
+    // The PID controller for steering
     PidSteer _pidSteer;
 
     /* utility functions */

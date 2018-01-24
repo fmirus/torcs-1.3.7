@@ -6,6 +6,7 @@ class PidAcc{
         PidAcc();
         PidAcc(float dt, float Kp, float Kd, float Ki);
 
+        // Calculate new acceleration value
         float step(float setPoint, float currentVal, float maxAcc);
 
     private:

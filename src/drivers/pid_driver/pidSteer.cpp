@@ -13,7 +13,6 @@ float PidSteer::step(float setpoint1, float setpoint2, float currentVal1, float 
     // Calculate error
     float error1 = 1 * (setpoint1 - currentVal1);
     float error2 = 1 * (setpoint2 - currentVal2);
-    // std::cout << "1: " << error1 << ", 2: " << error2 << std::endl;
     float error = _G1 * error1 + _G2 * error2;
 
     // Proportional term
