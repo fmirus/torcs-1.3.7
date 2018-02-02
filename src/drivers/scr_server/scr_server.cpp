@@ -25,6 +25,7 @@
 #include <iostream>
 #include <sstream>
 #include <ctime>
+#include <vector>
 
 #include <tgf.h>
 #include <track.h>
@@ -36,6 +37,7 @@
 #include "SimpleParser.h"
 #include "CarControl.h"
 #include "ObstacleSensors.h"
+#include "DynObjectSensors.h"
 
 #ifdef _WIN32
 typedef sockaddr_in tSockAddrIn;
@@ -60,7 +62,7 @@ typedef struct sockaddr_in tSockAddrIn;
 #define UDP_LISTEN_PORT 3001
 #define UDP_ID "SCR"
 #define UDP_DEFAULT_TIMEOUT 10000
-#define UDP_MSGLEN 1000
+#define UDP_MSGLEN 10000
 //#define __UDP_SERVER_VERBOSE__
 /************************/
 
@@ -122,6 +124,7 @@ static int oldGear[NBBOTS];
 
 static Sensors *trackSens[NBBOTS];
 static ObstacleSensors *oppSens[NBBOTS];
+static DynObjectSensor *dynObjSens[NBBOTS];
 static Sensors *focusSens[NBBOTS];//ML
 static float trackSensAngle[NBBOTS][19];
 
@@ -317,6 +320,7 @@ newrace(int index, tCarElt* car, tSituation *s)
 	}
     // Initialization of opponents sensors
     oppSens[index] = new ObstacleSensors(36, curTrack, car, s, (int) __SENSORS_RANGE__);
+    dynObjSens[index] = new DynObjectSensor(curTrack, car, s, (int) __SENSORS_RANGE__);
 
     prevDist[index]=-1;
 }
@@ -447,6 +451,38 @@ drive(int index, tCarElt* car, tSituation *s)
         	oppSensorOut[i] *= normRand(1,__OPP_NOISE_STD__);
     }
 
+    // update values of dynamic object sensor_range
+    dynObjSens[index]->updateSensors(s);
+    if (getNoisy())
+    {
+      dynObjSens[index]->addNoise(normRand(1,__OPP_NOISE_STD__));
+    }
+
+    std::vector<DynObject> obj_list = dynObjSens[index]->getObjectList();
+
+    int nb_objects = obj_list.size();
+
+    float dynObjSensorOut[12 * nb_objects];
+
+    if (!obj_list.empty())
+    {
+      for (size_t i = 0; i < obj_list.size(); i++)
+      {
+        dynObjSensorOut[12*i+0] = obj_list[i].x;
+        dynObjSensorOut[12*i+1] = obj_list[i].y;
+        dynObjSensorOut[12*i+2] = obj_list[i].z;
+        dynObjSensorOut[12*i+3] = obj_list[i].roll;
+        dynObjSensorOut[12*i+4] = obj_list[i].pitch;
+        dynObjSensorOut[12*i+5] = obj_list[i].yaw;
+        dynObjSensorOut[12*i+6] = obj_list[i].x_vel;
+        dynObjSensorOut[12*i+7] = obj_list[i].y_vel;
+        dynObjSensorOut[12*i+8] = obj_list[i].z_vel;
+        dynObjSensorOut[12*i+9] = obj_list[i].roll_vel;
+        dynObjSensorOut[12*i+10] = obj_list[i].pitch_vel;
+        dynObjSensorOut[12*i+11] = obj_list[i].yaw_vel;
+      }
+    }
+
     float wheelSpinVel[4];
     for (int i=0; i<4; ++i)
     {
@@ -488,6 +524,7 @@ drive(int index, tCarElt* car, tSituation *s)
     stateString += SimpleParser::stringify("gear", car->_gear);
     stateString += SimpleParser::stringify("lastLapTime", float(car->_lastLapTime));
     stateString += SimpleParser::stringify("opponents", oppSensorOut, 36);
+    stateString += SimpleParser::stringify("dynObjects", dynObjSensorOut, int(dynObjSens[index]->getFloatLength()));
     stateString += SimpleParser::stringify("racePos", car->race.pos);
     stateString += SimpleParser::stringify("rpm", car->_enginerpm*10);
     stateString += SimpleParser::stringify("speedX", float(car->_speed_x  * 3.6));
@@ -510,7 +547,7 @@ if (RESTARTING[index]==0)
 #endif
 
 #ifdef __STEP_LIMIT__
-    
+
     if (total_tics[index]>__STEP_LIMIT__)
     {
 	RESTARTING[index] = 1;
@@ -528,7 +565,7 @@ if (RESTARTING[index]==0)
 	return;
     }
 #endif
-	
+
 
     // Sending the car state to the client
     if (sendto(listenSocket[index], line, strlen(line) + 1, 0,
@@ -542,7 +579,7 @@ if (RESTARTING[index]==0)
     FD_SET(listenSocket[index], &readSet);
     timeVal.tv_sec = 0;
     timeVal.tv_usec = UDP_TIMEOUT;
-    memset(line, 0x0,1000 );
+    memset(line, 0x0,UDP_MSGLEN );
 
     if (select(listenSocket[index]+1, &readSet, NULL, NULL, &timeVal))
     {
@@ -631,6 +668,13 @@ endrace(int index, tCarElt *car, tSituation *s)
         delete oppSens[index];
         oppSens[index] = NULL;
     }
+
+    if (dynObjSens[index] != NULL)
+    {
+        delete dynObjSens[index];
+        dynObjSens[index] = NULL;
+    }
+
 	if (focusSens[index] != NULL)//ML
     {
         delete focusSens[index];
@@ -679,7 +723,7 @@ if (curPosition==max_pos)
 	fprintf(f,"\n\n\n");
 	fclose(f);
 }
-//std::cout << "car,pos,points,time,bestLap,damages"<< std::endl;  
+//std::cout << "car,pos,points,time,bestLap,damages"<< std::endl;
 //std::cout << "champ" << (index+1) <<"," << position <<"," << points[position-1] <<"," << totalTime[index] <<"," << bestLap[index] <<"\t" << damages[index]<< std::endl;
 #endif
 
@@ -720,6 +764,11 @@ if (curPosition==max_pos)
         delete oppSens[index];
         oppSens[index] = NULL;
     }
+    if (dynObjSens[index] != NULL)
+    {
+        delete dynObjSens[index];
+        dynObjSens[index] = NULL;
+    }
     CLOSE(listenSocket[index]);
 }
 
@@ -738,4 +787,3 @@ double normRand(double avg,double std)
 	    y2 = x2 * w;
 	    return y1*std + avg;
 }
-

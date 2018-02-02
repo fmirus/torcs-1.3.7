@@ -16,10 +16,10 @@
 ROBOT       = scr_server
 MODULE      = ${ROBOT}.so
 MODULEDIR   = drivers/${ROBOT}
-SOURCES     = ${ROBOT}.cpp sensors.cpp SimpleParser.cpp CarControl.cpp ObstacleSensors.cpp 
+SOURCES     = ${ROBOT}.cpp sensors.cpp SimpleParser.cpp CarControl.cpp ObstacleSensors.cpp DynObjectSensors.cpp
 
 SHIPDIR     = drivers/${ROBOT}
-SHIP        = ${ROBOT}.xml 
+SHIP        = ${ROBOT}.xml
 SHIPSUBDIRS = 0 1 2 3 4 5 6 7 8 9
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}
@@ -27,4 +27,3 @@ src-robots-scr_server_PKGFILES = $(shell find * -maxdepth 0 -type f -print)
 src-robots-scr_server_PKGDIR   = ${PACKAGE}-${VERSION}/$(subst ${TORCS_BASE},,$(shell pwd))
 
 include ${MAKE_DEFAULT}
-
