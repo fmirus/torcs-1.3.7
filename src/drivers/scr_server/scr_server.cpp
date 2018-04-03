@@ -63,7 +63,7 @@ typedef struct sockaddr_in tSockAddrIn;
 #define UDP_ID "SCR"
 #define UDP_DEFAULT_TIMEOUT 10000
 #define UDP_MSGLEN 10000
-//#define __UDP_SERVER_VERBOSE__
+// #define __UDP_SERVER_VERBOSE__
 /************************/
 
 static int UDP_TIMEOUT = UDP_DEFAULT_TIMEOUT;
@@ -188,6 +188,29 @@ initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSitu
 {
     curTrack = track;
     *carParmHandle = NULL;
+    if (trackSens != NULL)
+    {
+        delete trackSens[index];
+        trackSens[index] = NULL;
+    }
+
+    if (oppSens[index] != NULL)
+    {
+        delete oppSens[index];
+        oppSens[index] = NULL;
+    }
+
+    if (dynObjSens[index] != NULL)
+    {
+        delete dynObjSens[index];
+        dynObjSens[index] = NULL;
+    }
+
+	if (focusSens[index] != NULL)//ML
+    {
+        delete focusSens[index];
+        focusSens[index] = NULL;
+    }
 #ifdef _PRINT_RACE_RESULTS__
     trackName = strrchr(track->filename, '/') + 1;
 #endif
@@ -197,7 +220,6 @@ initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSitu
 static void
 newrace(int index, tCarElt* car, tSituation *s)
 {
-
     total_tics[index]=0;
 
     /***********************************************************************************
@@ -342,12 +364,13 @@ drive(int index, tCarElt* car, tSituation *s)
     if (RESTARTING[index]==1)
     {
 
-	char line[101];
+	// char line[101];
+  char line[UDP_MSGLEN]
         clientAddressLength[index] = sizeof(clientAddress[index]);
 
         // Set line to all zeroes
-        memset(line, 0x0, 101);
-        if (recvfrom(listenSocket[index], line, 100, 0,
+        memset(line, 0x0, UDP_MSGLEN);
+        if (recvfrom(listenSocket[index], line, UDP_MSGLEN, 0,
                      (struct sockaddr *) &clientAddress[index],
                      &clientAddressLength[index]) < 0)
         {
