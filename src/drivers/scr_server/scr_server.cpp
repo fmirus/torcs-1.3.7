@@ -498,6 +498,15 @@ drive(int index, tCarElt* car, tSituation *s)
     stateString += SimpleParser::stringify("wheelSpinVel", wheelSpinVel, 4);
     stateString += SimpleParser::stringify("z", car->_pos_Z  - RtTrackHeightL(&(car->_trkPos)));
 	stateString += SimpleParser::stringify("focus", focusSensorOut, 5);//ML
+    stateString += SimpleParser::stringify("x", car->_pos_X);
+    stateString += SimpleParser::stringify("y", car->_pos_Y);
+    stateString += SimpleParser::stringify("roll", car->_roll);
+    stateString += SimpleParser::stringify("pitch", car->_pitch);
+    stateString += SimpleParser::stringify("yaw", car->_yaw);
+    stateString += SimpleParser::stringify("speedGlobalX", car->_speed_X);
+    stateString += SimpleParser::stringify("speedGlobalY", car->_speed_Y);
+
+
 
     char line[UDP_MSGLEN];
     sprintf(line,"%s",stateString.c_str());
