@@ -27,10 +27,10 @@
 
 /**
    @defgroup trackmodint Track Loader Module Interface
-   @brief Interface for track loader modules, the track loader module is discovered and loaded during runtime.   
+   @brief Interface for track loader modules, the track loader module is discovered and loaded during runtime.
    @ingroup	modint
 */
- 
+
 #ifndef _TRACKV1_H_
 #define _TRACKV1_H_
 
@@ -451,7 +451,7 @@ typedef struct TrackOwnPit
 } tTrackOwnPit;
 
 /** Pits Info Structure */
-typedef struct 
+typedef struct
 {
 	int type;		/**< Type of Pit:
 				   - TR_PIT_NONE
@@ -486,7 +486,7 @@ typedef struct
     tdble	vSpace;
 } tTurnMarksInfo;
 
-typedef struct 
+typedef struct
 {
     const char *background;
     char		*background2;
@@ -527,11 +527,11 @@ typedef struct
  *  @param[in] filename filename including path to file
  *  @return tTrack structure on success
  *  @note The given file must exist and must be correct
- */ 
+ */
 typedef tTrack*(*tfTrackBuild)(char* filename);
 
 /** @brief Returns the absolute height in meters of the road at the given global position.
- *  @ingroup trackmodint 
+ *  @ingroup trackmodint
  *  @param[in] seg Segment tTrackSeg to start search for coordinates
  *  @param[in] X Global X coordinate
  *  @param[in] Y Global Y coordinate
@@ -560,7 +560,7 @@ typedef tdble(*tfTrackHeightL)(tTrkLocPos* pos);
  *  - #TR_LPOS_SEGMENT If the point is on a side, relative to this side
  *  - #TR_LPOS_TRACK Local position includes all the track width (distance to barrier)
  *  @see RtTrackGlobal2Local
- */ 
+ */
 typedef void(*tfTrackGlobal2Local)(tTrackSeg* seg, tdble X, tdble Y, tTrkLocPos* pos, int type);
 
 /** @brief Convert a local position (segment, toRight, toStart) into a global one (X, Y)
@@ -669,7 +669,7 @@ typedef struct {
 
 #define TRK_ATT_FINISH	"finish segment"
 
-#endif /* _TRACKV1_H_ */ 
+#endif /* _TRACKV1_H_ */
 
 
 

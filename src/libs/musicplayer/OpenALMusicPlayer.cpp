@@ -52,27 +52,27 @@ void OpenALMusicPlayer::stop()
 	if (!ready) {
 		return;
 	}
-	
+
 	alSourceStop(source);
-    
+
 	int queued;
-	
+
 	alGetSourcei(source, AL_BUFFERS_QUEUED, &queued);
 	while (queued--) {
 		ALuint buffer;
 		alSourceUnqueueBuffers(source, 1, &buffer);
 		check();
 	}
-	
+
     alDeleteSources(1, &source);
     check();
     alDeleteBuffers(2, buffers);
     check();
-	
+
 	alcMakeContextCurrent(NULL);
 	alcDestroyContext(context);
 	alcCloseDevice(device);
-	
+
 	ready = false;
 }
 
@@ -96,7 +96,7 @@ bool OpenALMusicPlayer::initContext()
 
 	alcMakeContextCurrent(context);
 	alcGetError(device);
-	
+
 	return check();
 }
 
@@ -119,13 +119,13 @@ bool OpenALMusicPlayer::initSource()
 		GfError("OpenALMusicPlayer: initSource failed to get sound source.\n");
 		return false;
 	};
-    
+
     alSource3f(source, AL_POSITION,        0.0, 0.0, 0.0);
     alSource3f(source, AL_VELOCITY,        0.0, 0.0, 0.0);
     alSource3f(source, AL_DIRECTION,       0.0, 0.0, 0.0);
     alSourcef (source, AL_ROLLOFF_FACTOR,  0.0          );
     alSourcei (source, AL_SOURCE_RELATIVE, AL_TRUE      );
-	
+
 	return true;
 }
 
@@ -150,8 +150,8 @@ bool OpenALMusicPlayer::check()
 bool OpenALMusicPlayer::isPlaying()
 {
     ALenum state;
-	
-    alGetSourcei(source, AL_SOURCE_STATE, &state);    
+
+    alGetSourcei(source, AL_SOURCE_STATE, &state);
     return (state == AL_PLAYING);
 }
 
@@ -161,8 +161,8 @@ bool OpenALMusicPlayer::streamBuffer(ALuint buffer)
 {
 	char pcm[BUFFERSIZE];
 	int size = 0;
-	const char* error = '\0';
-	
+	const char* error = "\0";
+
 	if (!stream->read(pcm, BUFFERSIZE, &size, &error)) {
 		GfError("OpenALMusicPlayer: Stream read error: %s\n", error);
 		return false;
@@ -179,7 +179,7 @@ bool OpenALMusicPlayer::streamBuffer(ALuint buffer)
 				GfError("OpenALMusicPlayer: Format error: \n");
 				return false;
 		}
-		
+
 		alBufferData(buffer, format, pcm, size, stream->getRateInHz());
 		return check();
 	}
@@ -195,12 +195,12 @@ void OpenALMusicPlayer::start()
 			GfError("OpenALMusicPlayer: Sound stream has invalid format\n");
 			return;
 		}
-		
+
 		if (initContext() && initBuffers() && initSource()) {
 			ready = true;
 			startPlayback();
 		}
-		
+
 		return;
 	}
 }
@@ -221,7 +221,7 @@ bool OpenALMusicPlayer::playAndManageBuffer()
 	if (!ready) {
 		return false;
 	}
-	
+
 	int processed;
 	bool active = true;
 
@@ -229,7 +229,7 @@ bool OpenALMusicPlayer::playAndManageBuffer()
 
 	while(processed--) {
 		ALuint buffer;
-		
+
 		alSourceUnqueueBuffers(source, 1, &buffer);
 		check();
 		active = streamBuffer(buffer);
@@ -243,7 +243,7 @@ bool OpenALMusicPlayer::playAndManageBuffer()
 			GfError("OpenALMusicPlayer: Cannot play stream.\n");
 		}
 	}
-	
+
 	return true;
 }
 
@@ -255,17 +255,17 @@ bool OpenALMusicPlayer::startPlayback()
     if(isPlaying()) {
         return true;
 	}
-	
+
     if(!streamBuffer(buffers[0])) {
         return false;
 	}
-        
+
     if(!streamBuffer(buffers[1])) {
         return false;
 	}
-    
+
     alSourceQueueBuffers(source, 2, buffers);
     alSourcePlay(source);
-    
+
     return true;
 }

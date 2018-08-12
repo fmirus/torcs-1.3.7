@@ -190,7 +190,7 @@ typedef struct {
 
 /** Public info on the cars */
 typedef struct {
-    tDynPt	DynGC;		/**< GC data (car axis) */    
+    tDynPt	DynGC;		/**< GC data (car axis) */
     tDynPt	DynGCg;		/**< GC data (world axis) */
 	tdble	speed;		// total speed, sqrt(vx*vx + vy*vy + vz*vz)
     sgMat4	posMat;		/**< position matrix */
@@ -312,7 +312,7 @@ typedef struct {
 	float   smoke;
     t3Dd	normal;
     t3Dd	collpos;        /**< Collision position, useful for sound*/
-    int     fakeDammage;    
+    int     fakeDammage;
     int		dammage;
     int		debug;
 	tCollisionState collision_state; /**< collision state */
@@ -376,7 +376,7 @@ typedef struct {
 
 struct RobotItf;
 
-typedef struct 
+typedef struct
 {
 	tdble value;
 	tdble min;
@@ -385,11 +385,11 @@ typedef struct
 
 
 
-typedef struct 
+typedef struct
 {
 	// Steer
 	tCarPitSetupValue steerLock;
-	
+
 	//Wheel
 	tCarPitSetupValue wheelcamber[4];
 	tCarPitSetupValue wheeltoe[4];
@@ -434,7 +434,7 @@ typedef struct
 } tCarPitSetup;
 
 /** Command issued by the car during pit stop */
-typedef struct 
+typedef struct
 {
     tdble		fuel;
     int			repair;
@@ -463,7 +463,7 @@ typedef struct CarElt
     struct RobotItf	*robot;	/**< private */
     struct CarElt	*next;
     int         RESTART;
-    int         RESET;    
+    int         RESET;
 } tCarElt;
 
 
@@ -687,7 +687,7 @@ typedef struct CarElt
 #define SEM_COLLISION_Z_CRASH	0x10
 
 
-#endif /* __CARV1_H__ */ 
+#endif /* __CARV1_H__ */
 
 
 

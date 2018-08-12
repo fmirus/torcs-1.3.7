@@ -2,9 +2,9 @@
 #
 #    file                 : Makefile
 #    created              : Sat Mar 18 23:08:21 CET 2000
-#    copyright            : (C) 2000 by Eric Espie                         
-#    email                : torcs@free.fr   
-#    version              : $Id: Makefile,v 1.4 2002/06/30 14:11:14 torcs Exp $                                  
+#    copyright            : (C) 2000 by Eric Espie
+#    email                : torcs@free.fr
+#    version              : $Id: Makefile,v 1.4 2002/06/30 14:11:14 torcs Exp $
 #
 ##############################################################################
 #
