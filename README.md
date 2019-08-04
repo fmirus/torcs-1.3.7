@@ -1,9 +1,33 @@
 # **TORCS 1.3.7** 
 Version of TORCS 1.3.7 with [SCR patch](https://github.com/barisdemirdelen/scr-torcs-1.3.7) and an additional patch to send the current game image to another application via shared memory.
 
-## Installation
+## Installation on Ubuntu 18.04
 
-This installation guide has only been tested with Ubuntu 16.04!
+For Ubuntu 18.04, please proceed as follow:
+
+### Install all necessary requirements
+
+```
+sudo apt-get install libglib2.0-dev  libgl1-mesa-dev libglu1-mesa-dev  freeglut3-dev  libplib-dev  libopenal-dev libalut-dev libxi-dev libxmu-dev libxrender-dev  libxrandr-dev libpng-dev
+```
+
+### Build torcs
+
+```
+$ export CFLAGS="-fPIC"
+$ export CPPFLAGS=$CFLAGS
+$ export CXXFLAGS=$CFLAGS
+$ ./configure --prefix=$(pwd)/BUILD  # local install dir
+$ make
+$ make install
+$ make datainstall
+```
+
+### Usage with ROS
+
+If you want to run this software with the ROS adapter, you also need to install opencv uing `$apt-get install -y *opencv*`, after installing the ROS Melodic release.
+
+## Installation on Ubuntu 16.04
 
 ### install torcs dependencies
 first we need to get some necessary debian packages
