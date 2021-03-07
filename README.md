@@ -1,6 +1,35 @@
 # **TORCS 1.3.7** 
 Version of TORCS 1.3.7 with [SCR patch](https://github.com/barisdemirdelen/scr-torcs-1.3.7) and an additional patch to send the current game image to another application via shared memory.
 
+## Installation on Ubuntu 20.04
+
+For Ubuntu 20.04, please proceed as follow:
+
+### Install all necessary requirements
+
+```
+sudo apt-get install libglib2.0-dev  libgl1-mesa-dev libglu1-mesa-dev  freeglut3-dev  libplib-dev  libopenal-dev libalut-dev libxi-dev libxmu-dev libxrender-dev  libxrandr-dev libpng-dev libvorbis-dev
+```
+
+### Build torcs
+
+```
+$ export CFLAGS="-fPIC"
+$ export CPPFLAGS=$CFLAGS
+$ export CXXFLAGS=$CFLAGS
+$ ./configure --prefix=$(pwd)/BUILD  # local install dir
+$ make
+$ make install
+$ make datainstall
+```
+### Run torcs
+
+To run torcs with local installation, execute
+
+```
+./your_path_to_torcs/torcs-1.3.7/BUILD/bin/torcs
+```
+
 ## Installation on Ubuntu 18.04
 
 For Ubuntu 18.04, please proceed as follow:
